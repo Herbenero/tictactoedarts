@@ -342,7 +342,40 @@ h1 {
     }
 
 }
+/* ========================== CHOOSE TARGET ========================== */
+function chooseRandomTarget() {
+  /* Get all unclaimed target indices */
+  const available = [];
+  for (let i = 0; i < boardData.length; i++) {
+    if (boardData[i].owner === null) {
+      available.push(i);
+    }
+  }
 
+  /* If all numbers are claimed, target the Bull */
+  if (available.length === 0) {
+    if (bullData.owner === null) {
+      currentTarget = "bull";
+      const lastThrow = document.getElementById("lastThrow");
+      if (lastThrow) lastThrow.textContent = "All numbers claimed! Target is BULL.";
+    }
+    return;
+  }
+
+  /* Pick a random unclaimed space */
+  const randomPosition = Math.floor(Math.random() * available.length);
+  currentTarget = available[randomPosition];
+
+  /* Update highlights */
+  document.querySelectorAll(".target").forEach(t => t.classList.remove("random-highlight"));
+  const targetEl = document.getElementById("target-" + currentTarget);
+  if (targetEl) targetEl.classList.add("random-highlight");
+
+  const lastThrow = document.getElementById("lastThrow");
+  if (lastThrow) {
+    lastThrow.textContent = players[currentPlayer].name + "'s target is " + boardNumbers[currentTarget] + ". Select Single, Double, or Triple.";
+  }
+}
 </style>
 </head>
 
