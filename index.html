@@ -420,20 +420,7 @@ h1 {
     </div>
 
 
-    <div class="random-target">
-
-        <div class="random-label">
-            Random Target
-        </div>
-
-        <div class="random-number"
-             id="randomNumber">
-        </div>
-
-    </div>
-
-
-    <div class="players"
+        <div class="players"
          id="playersDisplay">
     </div>
 
@@ -871,9 +858,79 @@ function createBoard() {
 
         const target =
             document.createElement(
-                "div"
+                "button"
+            );
+function selectTarget(index) {
+
+    if (gameOver) return;
+
+    /*
+    Players may select any
+    unclaimed number at any time.
+    */
+
+    if (boardData[index].owner !== null) {
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            "That number has already been claimed.";
+
+        return;
+    }
+
+    currentTarget = index;
+
+    /*
+    Remove previous highlights.
+    */
+
+    document
+        .querySelectorAll(".target")
+        .forEach(target => {
+
+            target.classList.remove(
+                "random-highlight"
             );
 
+        });
+
+
+    /*
+    Highlight the number
+    the player selected.
+    */
+
+    const target =
+        document.getElementById(
+            "target-" + index
+        );
+
+    target.classList.add(
+        "random-highlight"
+    );
+
+
+    /*
+    Update message.
+    */
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+
+        players[currentPlayer].name +
+
+        " selected " +
+
+        boardNumbers[index] +
+
+        ". Choose Single, Double, or Triple.";
+}
+        
+target.onclick = function() {
+    selectTarget(i);
+};
 
         target.className =
             "target";
@@ -913,35 +970,6 @@ function createBoard() {
 }
 
 
-/* ==========================
-   RANDOM TARGET
-========================== */
-
-function chooseRandomTarget() {
-
-    /*
-    Find all unclaimed
-    numbers.
-    */
-
-    const available = [];
-
-
-    for(
-        let i = 0;
-        i < 20;
-        i++
-    ) {
-
-        if(
-            boardData[i].owner === null
-        ) {
-
-            available.push(i);
-
-        }
-
-    }
 
 
     /*
