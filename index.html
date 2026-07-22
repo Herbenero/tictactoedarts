@@ -300,7 +300,1991 @@ h2 {
 
 <body>
 
+<div cl<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dartboard Connect 4</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 15px;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    color: #222;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    margin: 5px 0 20px;
+}
+
+.setup {
+    text-align: center;
+}
+
+.player-count {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.count-btn {
+    width: 65px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: #ddd;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.count-btn.active {
+    background: #222;
+    color: white;
+}
+
+.name-input {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+    margin: 8px auto;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.primary-btn,
+.secondary-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: #222;
+    color: white;
+}
+
+.secondary-btn {
+    background: #ddd;
+    color: #222;
+}
+
+.game {
+    display: none;
+}
+
+.turn-display {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 12px;
+    background: #eee;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.dart-counter {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.random-target {
+    max-width: 500px;
+    margin: 0 auto 15px;
+    padding: 15px;
+    text-align: center;
+    border-radius: 12px;
+    background: #222;
+    color: white;
+}
+
+.random-label {
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.random-number {
+    font-size: 42px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.players {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.player-card {
+    padding: 10px 5px;
+    text-align: center;
+    background: #eee;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.player-card.active {
+    outline: 3px solid #222;
+}
+
+.player-symbol {
+    display: block;
+    font-size: 25px;
+    margin-bottom: 4px;
+}
+
+
+/* ==========================
+   5 x 4 SCOREBOARD
+========================== */
+
+.target-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.target {
+    min-height: 90px;
+    border: none;
+    border-radius: 12px;
+    background: #e6e6e6;
+    font-weight: bold;
+    cursor: default;
+    transition: transform 0.2s;
+}
+
+.target-number {
+    display: block;
+    font-size: 28px;
+}
+
+.target-hits {
+    display: block;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.target-owner {
+    display: block;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.target.random-highlight {
+    animation: pulse 0.7s infinite alternate;
+    outline: 5px solid #222;
+}
+
+@keyframes pulse {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+
+}
+
+
+/* ==========================
+   BULL WILD
+========================== */
+
+.bull-area {
+    max-width: 650px;
+    margin: 12px auto 20px;
+}
+
+.bull {
+    width: 100%;
+    min-height: 75px;
+    border-radius: 12px;
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.bull-number {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.bull-info {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+
+.controls {
+    max-width: 650px;
+    margin: auto;
+}
+
+.controls h3 {
+    text-align: center;
+}
+
+.dart-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.dart-btn {
+    padding: 15px 5px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    background: #ddd;
+}
+
+.dart-btn:hover {
+    opacity: 0.8;
+}
+
+.dart-btn.miss {
+    background: #999;
+    color: white;
+}
+
+.last-throw {
+    text-align: center;
+    margin: 15px 0;
+    min-height: 25px;
+    font-weight: bold;
+}
+
+.winner-screen {
+    display: none;
+    text-align: center;
+}
+
+.winner-symbol {
+    font-size: 80px;
+    margin: 20px;
+}
+
+.winner-name {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.winner-message {
+    font-size: 20px;
+    margin: 15px;
+}
+
+@media(max-width:600px) {
+
+    .container {
+        padding: 12px;
+    }
+
+    .target-board {
+        gap: 5px;
+    }
+
+    .target {
+        min-height: 70px;
+    }
+
+    .target-number {
+        font-size: 21px;
+    }
+
+    .target-hits {
+        font-size: 12px;
+    }
+
+    .target-owner {
+        font-size: 9px;
+    }
+
+    .dart-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .players {
+        gap: 4px;
+    }
+
+    .player-card {
+        font-size: 11px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
 <div class="container">
+
+
+<!-- ==========================
+     SETUP
+========================== -->
+
+<div class="setup" id="setupScreen">
+
+    <h1>🎯 Dartboard Connect 4</h1>
+
+    <h2>Select Number of Players</h2>
+
+    <div class="player-count">
+
+        <button class="count-btn"
+                onclick="selectPlayerCount(2)">
+            2
+        </button>
+
+        <button class="count-btn"
+                onclick="selectPlayerCount(3)">
+            3
+        </button>
+
+        <button class="count-btn active"
+                onclick="selectPlayerCount(4)">
+            4
+        </button>
+
+    </div>
+
+    <div id="nameInputs"></div>
+
+    <button class="primary-btn"
+            onclick="startGame()">
+
+        Start Game
+
+    </button>
+
+</div>
+
+
+<!-- ==========================
+     GAME
+========================== -->
+
+<div class="game" id="gameScreen">
+
+    <h1>🎯 Dartboard Connect 4</h1>
+
+    <div class="turn-display"
+         id="turnDisplay">
+    </div>
+
+    <div class="dart-counter"
+         id="dartCounter">
+    </div>
+
+
+    <div class="random-target">
+
+        <div class="random-label">
+            Random Target
+        </div>
+
+        <div class="random-number"
+             id="randomNumber">
+        </div>
+
+    </div>
+
+
+    <div class="players"
+         id="playersDisplay">
+    </div>
+
+
+    <!-- 5 x 4 BOARD -->
+
+    <div class="target-board"
+         id="targetBoard">
+    </div>
+
+
+    <!-- BULL -->
+
+    <div class="bull-area">
+
+        <div class="bull">
+
+            <div class="bull-number">
+                BULL — WILD
+            </div>
+
+            <div class="bull-info">
+                Bull can connect with any number
+                in the bottom row.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="last-throw"
+         id="lastThrow">
+    </div>
+
+
+    <div class="controls">
+
+        <h3>
+            What did you hit?
+        </h3>
+
+        <div class="dart-buttons">
+
+            <button class="dart-btn"
+                    onclick="throwDart(1)">
+                SINGLE
+                <br>
+                <small>1 Hit</small>
+            </button>
+
+            <button class="dart-btn"
+                    onclick="throwDart(2)">
+                DOUBLE
+                <br>
+                <small>2 Hits</small>
+            </button>
+
+            <button class="dart-btn"
+                    onclick="throwDart(3)">
+                TRIPLE
+                <br>
+                <small>3 Hits</small>
+            </button>
+
+            <button class="dart-btn miss"
+                    onclick="throwMiss()">
+                MISS
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <button class="secondary-btn"
+            onclick="newGame()">
+
+        New Game
+
+    </button>
+
+</div>
+
+
+<!-- ==========================
+     WINNER
+========================== -->
+
+<div class="winner-screen"
+     id="winnerScreen">
+
+    <h1>🏆 GAME OVER!</h1>
+
+    <div class="winner-symbol"
+         id="winnerSymbol">
+    </div>
+
+    <div class="winner-name"
+         id="winnerName">
+    </div>
+
+    <div class="winner-message">
+        Connected 4 and won the game!
+    </div>
+
+    <button class="primary-btn"
+            onclick="newGame()">
+
+        Play Again
+
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+
+/* ==========================
+   GAME SETTINGS
+========================== */
+
+const symbols = [
+    "X",
+    "O",
+    "▲",
+    "■"
+];
+
+let playerCount = 4;
+
+let players = [];
+
+let currentPlayer = 0;
+
+let dartNumber = 0;
+
+let gameOver = false;
+
+
+/*
+The scoreboard positions
+contain the shuffled numbers.
+
+Example:
+
+  7   19   3   15   11
+  2   18  20    6    9
+ 14    1  13    5   17
+  8   12   10    4   16
+
+Any 4 connected spaces
+can win.
+*/
+
+let boardNumbers = [];
+
+
+/*
+Each board position stores:
+
+hits
+owner
+
+*/
+
+let boardData = [];
+
+
+/*
+Bull is separate.
+
+Bull can act as a wild
+with any bottom-row number.
+*/
+
+let bullData = {
+
+    hits: 0,
+
+    owner: null
+
+};
+
+
+let currentTarget = null;
+
+
+/* ==========================
+   PLAYER SETUP
+========================== */
+
+function selectPlayerCount(count) {
+
+    playerCount = count;
+
+    document
+        .querySelectorAll(".count-btn")
+        .forEach(btn => {
+
+            btn.classList.remove(
+                "active"
+            );
+
+        });
+
+    event.target.classList.add(
+        "active"
+    );
+
+    createNameInputs();
+
+}
+
+
+function createNameInputs() {
+
+    const container =
+        document.getElementById(
+            "nameInputs"
+        );
+
+    container.innerHTML = "";
+
+    for(
+        let i = 0;
+        i < playerCount;
+        i++
+    ) {
+
+        const input =
+            document.createElement(
+                "input"
+            );
+
+        input.className =
+            "name-input";
+
+        input.id =
+            "player" + i;
+
+        input.placeholder =
+            "Player " +
+            (i + 1) +
+            " Name";
+
+        input.maxLength = 20;
+
+        container.appendChild(
+            input
+        );
+
+    }
+
+}
+
+
+/* ==========================
+   SHUFFLE NUMBERS
+========================== */
+
+function shuffleNumbers() {
+
+    boardNumbers =
+        Array.from(
+            {length: 20},
+            (_, i) => i + 1
+        );
+
+
+    /*
+    Fisher-Yates shuffle
+    */
+
+    for(
+        let i = boardNumbers.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            boardNumbers[i],
+            boardNumbers[j]
+        ] =
+        [
+            boardNumbers[j],
+            boardNumbers[i]
+        ];
+
+    }
+
+}
+
+
+/* ==========================
+   START GAME
+========================== */
+
+function startGame() {
+
+    players = [];
+
+
+    for(
+        let i = 0;
+        i < playerCount;
+        i++
+    ) {
+
+        const input =
+            document.getElementById(
+                "player" + i
+            );
+
+
+        let name =
+            input.value.trim();
+
+
+        if(!name) {
+
+            name =
+                "Player " +
+                (i + 1);
+
+        }
+
+
+        players.push({
+
+            name: name,
+
+            symbol: symbols[i]
+
+        });
+
+    }
+
+
+    currentPlayer = 0;
+
+    dartNumber = 0;
+
+    gameOver = false;
+
+
+    /*
+    Randomly mix 1–20
+    */
+
+    shuffleNumbers();
+
+
+    /*
+    Create board data
+    */
+
+    boardData =
+        boardNumbers.map(
+            () => ({
+
+                hits: 0,
+
+                owner: null
+
+            })
+        );
+
+
+    bullData = {
+
+        hits: 0,
+
+        owner: null
+
+    };
+
+
+    document.getElementById(
+        "setupScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "winnerScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "gameScreen"
+    ).style.display =
+        "block";
+
+
+    createBoard();
+
+    chooseRandomTarget();
+
+    updateDisplay();
+
+}
+
+
+/* ==========================
+   CREATE 5 x 4 BOARD
+========================== */
+
+function createBoard() {
+
+    const board =
+        document.getElementById(
+            "targetBoard"
+        );
+
+    board.innerHTML = "";
+
+
+    for(
+        let i = 0;
+        i < 20;
+        i++
+    ) {
+
+        const target =
+            document.createElement(
+                "div"
+            );
+
+
+        target.className =
+            "target";
+
+
+        target.id =
+            "target-" + i;
+
+
+        target.innerHTML =
+
+            '<span class="target-number">' +
+
+            boardNumbers[i] +
+
+            '</span>' +
+
+            '<span class="target-hits">' +
+
+            '0 / 3 Hits' +
+
+            '</span>' +
+
+            '<span class="target-owner">' +
+
+            'Unclaimed' +
+
+            '</span>';
+
+
+        board.appendChild(
+            target
+        );
+
+    }
+
+}
+
+
+/* ==========================
+   RANDOM TARGET
+========================== */
+
+function chooseRandomTarget() {
+
+    /*
+    Find all unclaimed
+    numbers.
+    */
+
+    const available = [];
+
+
+    for(
+        let i = 0;
+        i < 20;
+        i++
+    ) {
+
+        if(
+            boardData[i].owner === null
+        ) {
+
+            available.push(i);
+
+        }
+
+    }
+
+
+    /*
+    If no numbers remain,
+    select Bull if available.
+    */
+
+    if(
+        available.length === 0
+    ) {
+
+        if(
+            bullData.owner === null
+        ) {
+
+            currentTarget =
+                "bull";
+
+
+            document.getElementById(
+                "randomNumber"
+            ).textContent =
+                "BULL";
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+    Randomly select one
+    of the remaining numbers.
+    */
+
+    const randomPosition =
+        Math.floor(
+            Math.random() *
+            available.length
+        );
+
+
+    currentTarget =
+        available[
+            randomPosition
+        ];
+
+
+    /*
+    Remove highlights.
+    */
+
+    document
+        .querySelectorAll(".target")
+        .forEach(target => {
+
+            target.classList.remove(
+                "random-highlight"
+            );
+
+        });
+
+
+    const target =
+        document.getElementById(
+            "target-" +
+            currentTarget
+        );
+
+
+    target.classList.add(
+        "random-highlight"
+    );
+
+
+    document.getElementById(
+        "randomNumber"
+    ).textContent =
+
+        boardNumbers[
+            currentTarget
+        ];
+
+}
+
+
+/* ==========================
+   DART THROW
+========================== */
+
+function throwDart(hitCount) {
+
+    if(gameOver) return;
+
+
+    /*
+    BULL TARGET
+    */
+
+    if(
+        currentTarget === "bull"
+    ) {
+
+        bullData.hits +=
+            hitCount;
+
+
+        if(
+            bullData.hits >= 3
+        ) {
+
+            bullData.hits = 3;
+
+            bullData.owner =
+                currentPlayer;
+
+        }
+
+
+        dartNumber++;
+
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+
+            players[currentPlayer].name +
+
+            " hit Bull " +
+
+            hitCount +
+
+            " time" +
+
+            (
+                hitCount === 1
+                ? ""
+                : "s"
+            );
+
+
+        if(
+            bullData.owner !== null
+        ) {
+
+            document.getElementById(
+                "lastThrow"
+            ).textContent +=
+
+                " — Bull claimed!";
+
+        }
+
+
+        if(
+            checkWinner(
+                currentPlayer
+            )
+        ) {
+
+            endGame(
+                currentPlayer
+            );
+
+            return;
+
+        }
+
+
+        finishDart();
+
+        return;
+
+    }
+
+
+    /*
+    NUMBER TARGET
+    */
+
+    const data =
+        boardData[
+            currentTarget
+        ];
+
+
+    /*
+    Add total hits.
+    */
+
+    data.hits +=
+        hitCount;
+
+
+    /*
+    Third hit claims
+    the number.
+    */
+
+    if(
+        data.hits >= 3
+    ) {
+
+        data.hits = 3;
+
+        data.owner =
+            currentPlayer;
+
+    }
+
+
+    dartNumber++;
+
+
+    let message =
+
+        players[currentPlayer].name +
+
+        " hit " +
+
+        boardNumbers[
+            currentTarget
+        ] +
+
+        " " +
+
+        hitCount +
+
+        " time" +
+
+        (
+            hitCount === 1
+            ? ""
+            : "s"
+        );
+
+
+    if(
+        data.owner !== null
+    ) {
+
+        message +=
+
+            " — " +
+
+            players[currentPlayer].name +
+
+            " CLAIMED " +
+
+            boardNumbers[
+                currentTarget
+            ] +
+
+            "!";
+
+    } else {
+
+        message +=
+
+            " — " +
+
+            data.hits +
+
+            " / 3 hits.";
+
+    }
+
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+        message;
+
+
+    updateBoard();
+
+
+    /*
+    Check winner.
+    */
+
+    if(
+        data.owner !== null &&
+        checkWinner(
+            currentPlayer
+        )
+    ) {
+
+        endGame(
+            currentPlayer
+        );
+
+        return;
+
+    }
+
+
+    finishDart();
+
+}
+
+
+/* ==========================
+   FINISH DART
+========================== */
+
+function finishDart() {
+
+    if(
+        dartNumber >= 3
+    ) {
+
+        setTimeout(
+            nextPlayer,
+            700
+        );
+
+    } else {
+
+        setTimeout(
+            chooseRandomTarget,
+            400
+        );
+
+        updateDisplay();
+
+    }
+
+}
+
+
+/* ==========================
+   MISS
+========================== */
+
+function throwMiss() {
+
+    if(gameOver) return;
+
+
+    dartNumber++;
+
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+
+        players[currentPlayer].name +
+
+        " threw a MISS.";
+
+
+    finishDart();
+
+}
+
+
+/* ==========================
+   NEXT PLAYER
+========================== */
+
+function nextPlayer() {
+
+    dartNumber = 0;
+
+
+    currentPlayer++;
+
+
+    if(
+        currentPlayer >= playerCount
+    ) {
+
+        currentPlayer = 0;
+
+    }
+
+
+    chooseRandomTarget();
+
+    updateDisplay();
+
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+
+        players[currentPlayer].name +
+
+        "'s turn.";
+
+}
+
+
+/* ==========================
+   CHECK WINNER
+========================== */
+
+function checkWinner(player) {
+
+    /*
+    Convert board to ownership
+    */
+
+    const grid =
+        boardData.map(
+            cell => cell.owner
+        );
+
+
+    /*
+    Check horizontal
+    */
+
+    for(
+        let row = 0;
+        row < 4;
+        row++
+    ) {
+
+        for(
+            let col = 0;
+            col <= 1;
+            col++
+        ) {
+
+            let win = true;
+
+
+            for(
+                let x = 0;
+                x < 4;
+                x++
+            ) {
+
+                const index =
+                    row * 5 +
+                    col +
+                    x;
+
+
+                if(
+                    grid[index] !== player
+                ) {
+
+                    win = false;
+
+                    break;
+
+                }
+
+            }
+
+
+            if(win) return true;
+
+        }
+
+    }
+
+
+    /*
+    Check vertical
+    */
+
+    for(
+        let row = 0;
+        row <= 1;
+        row++
+    ) {
+
+        for(
+            let col = 0;
+            col < 5;
+            col++
+        ) {
+
+            let win = true;
+
+
+            for(
+                let y = 0;
+                y < 4;
+                y++
+            ) {
+
+                const index =
+                    (row + y) * 5 +
+                    col;
+
+
+                if(
+                    grid[index] !== player
+                ) {
+
+                    win = false;
+
+                    break;
+
+                }
+
+            }
+
+
+            if(win) return true;
+
+        }
+
+    }
+
+
+    /*
+    Check diagonal down-right
+    */
+
+    for(
+        let row = 0;
+        row <= 0;
+        row++
+    ) {
+
+        for(
+            let col = 0;
+            col <= 1;
+            col++
+        ) {
+
+            let win = true;
+
+
+            for(
+                let x = 0;
+                x < 4;
+                x++
+            ) {
+
+                const index =
+                    (row + x) * 5 +
+                    (col + x);
+
+
+                if(
+                    grid[index] !== player
+                ) {
+
+                    win = false;
+
+                    break;
+
+                }
+
+            }
+
+
+            if(win) return true;
+
+        }
+
+    }
+
+
+    /*
+    Check diagonal down-left
+    */
+
+    for(
+        let col = 3;
+        col < 5;
+        col++
+    ) {
+
+        let win = true;
+
+
+        for(
+            let x = 0;
+            x < 4;
+            x++
+        ) {
+
+            const index =
+                x * 5 +
+                (col - x);
+
+
+            if(
+                grid[index] !== player
+            ) {
+
+                win = false;
+
+                break;
+
+            }
+
+        }
+
+
+        if(win) return true;
+
+    }
+
+
+    /*
+    BULL WILD RULE
+
+    Bull can connect with ANY
+    number in the bottom row.
+
+    Therefore, if the player owns
+    Bull and has 3 connected
+    numbers ending at any bottom
+    row position, they win.
+    */
+
+
+    if(
+        bullData.owner === player
+    ) {
+
+        /*
+        Bottom row indexes:
+        15, 16, 17, 18, 19
+        */
+
+        for(
+            let bottom = 15;
+            bottom < 20;
+            bottom++
+        ) {
+
+            /*
+            Check horizontal
+            sequences involving
+            bottom-row position.
+
+            Bull can act as the
+            fourth position.
+            */
+
+            const row =
+                Math.floor(
+                    bottom / 5
+                );
+
+
+            const col =
+                bottom % 5;
+
+
+            /*
+            Three to the left
+            */
+
+            if(
+                col >= 3
+            ) {
+
+                if(
+
+                    grid[bottom] === player &&
+
+                    grid[bottom - 1] === player &&
+
+                    grid[bottom - 2] === player
+
+                ) {
+
+                    return true;
+
+                }
+
+            }
+
+
+            /*
+            Three to the right
+            */
+
+            if(
+                col <= 1
+            ) {
+
+                if(
+
+                    grid[bottom] === player &&
+
+                    grid[bottom + 1] === player &&
+
+                    grid[bottom + 2] === player
+
+                ) {
+
+                    return true;
+
+                }
+
+            }
+
+
+            /*
+            Three vertical
+            */
+
+            if(
+                bottom >= 15
+            ) {
+
+                if(
+
+                    grid[bottom] === player &&
+
+                    grid[bottom - 5] === player &&
+
+                    grid[bottom - 10] === player
+
+                ) {
+
+                    return true;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+/* ==========================
+   UPDATE BOARD
+========================== */
+
+function updateBoard() {
+
+    for(
+        let i = 0;
+        i < 20;
+        i++
+    ) {
+
+        const target =
+            document.getElementById(
+                "target-" + i
+            );
+
+
+        const data =
+            boardData[i];
+
+
+        const hits =
+            target.querySelector(
+                ".target-hits"
+            );
+
+
+        const owner =
+            target.querySelector(
+                ".target-owner"
+            );
+
+
+        hits.textContent =
+
+            data.hits +
+
+            " / 3 Hits";
+
+
+        if(
+            data.owner !== null
+        ) {
+
+            owner.textContent =
+
+                players[
+                    data.owner
+                ].name;
+
+
+            target.style.background =
+
+                getPlayerColor(
+                    data.owner
+                );
+
+
+            target.style.color =
+                "white";
+
+        } else {
+
+            owner.textContent =
+                "Unclaimed";
+
+
+            target.style.background =
+                "";
+
+
+            target.style.color =
+                "";
+
+        }
+
+    }
+
+}
+
+
+/* ==========================
+   UPDATE DISPLAY
+========================== */
+
+function updateDisplay() {
+
+    if(
+        !players.length
+    ) return;
+
+
+    const player =
+        players[currentPlayer];
+
+
+    document.getElementById(
+        "turnDisplay"
+    ).textContent =
+
+        player.name +
+
+        "'s Turn " +
+
+        player.symbol;
+
+
+    document.getElementById(
+        "dartCounter"
+    ).textContent =
+
+        "Dart " +
+
+        (dartNumber + 1) +
+
+        " of 3";
+
+
+    const container =
+        document.getElementById(
+            "playersDisplay"
+        );
+
+
+    container.innerHTML = "";
+
+
+    players.forEach(
+        (player, index) => {
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "player-card";
+
+
+            if(
+                index === currentPlayer
+            ) {
+
+                card.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            card.innerHTML =
+
+                '<span class="player-symbol">' +
+
+                player.symbol +
+
+                '</span>' +
+
+                player.name;
+
+
+            container.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    updateBoard();
+
+}
+
+
+/* ==========================
+   PLAYER COLORS
+========================== */
+
+function getPlayerColor(index) {
+
+    const colors = [
+
+        "#d62828",
+
+        "#1565c0",
+
+        "#2e7d32",
+
+        "#7b1fa2"
+
+    ];
+
+
+    return colors[index];
+
+}
+
+
+/* ==========================
+   END GAME
+========================== */
+
+function endGame(winner) {
+
+    gameOver = true;
+
+
+    document.getElementById(
+        "gameScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "winnerScreen"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "winnerSymbol"
+    ).textContent =
+
+        players[
+            winner
+        ].symbol;
+
+
+    document.getElementById(
+        "winnerName"
+    ).textContent =
+
+        players[
+            winner
+        ].name +
+
+        " Wins!";
+
+}
+
+
+/* ==========================
+   NEW GAME
+========================== */
+
+function newGame() {
+
+    gameOver = false;
+
+    currentPlayer = 0;
+
+    dartNumber = 0;
+
+    players = [];
+
+    boardNumbers = [];
+
+    boardData = [];
+
+
+    bullData = {
+
+        hits: 0,
+
+        owner: null
+
+    };
+
+
+    document.getElementById(
+        "gameScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "winnerScreen"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "setupScreen"
+    ).style.display =
+        "block";
+
+
+    createNameInputs();
+
+}
+
+
+/* ==========================
+   INITIALIZE
+========================== */
+
+createNameInputs();
+
+</script>
+
+</body>
+</html>ass="container">
 
 <!-- SETUP -->
 
