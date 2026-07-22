@@ -3,237 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Player Tic-Tac-Toe</title>
+
+<title>Hellcastle TicTacToe</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
 
-    body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Arial, Helvetica, sans-serif;
-        background: #f4f4f4;
-        color: #222;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 15px;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    color: #222;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+}
+
+h1 {
+    text-align: center;
+    margin: 5px 0 20px;
+}
+
+h2 {
+    margin-top: 10px;
+}
+
+.setup {
+    text-align: center;
+}
+
+.player-count {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.count-btn {
+    width: 65px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: #ddd;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.count-btn.active {
+    background: #222;
+    color: white;
+}
+
+.name-input {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+    margin: 8px auto;
+    padding: 14px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.primary-btn,
+.secondary-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: #222;
+    color: white;
+}
+
+.secondary-btn {
+    background: #ddd;
+    color: #222;
+}
+
+.game {
+    display: none;
+}
+
+.turn-display {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 12px;
+    background: #eee;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.dart-counter {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.players {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.player-card {
+    padding: 10px 5px;
+    text-align: center;
+    background: #eee;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.player-card.active {
+    outline: 3px solid #222;
+}
+
+.player-symbol {
+    display: block;
+    font-size: 25px;
+    margin-bottom: 4px;
+}
+
+.target-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-width: 650px;
+    margin: 0 auto 20px;
+}
+
+.target {
+    position: relative;
+    min-height: 75px;
+    border: none;
+    border-radius: 12px;
+    background: #e6e6e6;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    transition: transform 0.1s;
+}
+
+.target:hover {
+    transform: scale(1.03);
+}
+
+.target.claimed {
+    color: white;
+}
+
+.target-number {
+    display: block;
+    font-size: 26px;
+}
+
+.target-status {
+    display: block;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.bull {
+    grid-column: span 5;
+    background: #ddd;
+}
+
+.controls {
+    max-width: 650px;
+    margin: auto;
+}
+
+.controls h3 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dart-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.dart-btn {
+    padding: 15px 5px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    background: #ddd;
+}
+
+.dart-btn:hover {
+    opacity: 0.8;
+}
+
+.dart-btn.miss {
+    background: #999;
+    color: white;
+}
+
+.last-throw {
+    text-align: center;
+    margin: 15px 0;
+    min-height: 25px;
+    font-weight: bold;
+}
+
+.winner-screen {
+    display: none;
+    text-align: center;
+}
+
+.winner-symbol {
+    font-size: 80px;
+    margin: 20px;
+}
+
+.winner-name {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.winner-message {
+    font-size: 20px;
+    margin: 15px;
+}
+
+@media(max-width:600px) {
 
     .container {
-        width: 100%;
-        max-width: 650px;
-        background: white;
-        border-radius: 20px;
-        padding: 25px;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-        text-align: center;
-    }
-
-    h1 {
-        margin: 0 0 20px;
-        font-size: 2rem;
-    }
-
-    .setup {
-        display: block;
-    }
-
-    .setup h2 {
-        margin-bottom: 15px;
-    }
-
-    .player-count {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .count-btn {
-        width: 60px;
-        height: 50px;
-        border: none;
-        border-radius: 10px;
-        background: #ddd;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .count-btn.active {
-        background: #333;
-        color: white;
-    }
-
-    .name-input {
-        width: 100%;
-        padding: 14px;
-        margin: 7px 0;
-        border: 2px solid #ddd;
-        border-radius: 10px;
-        font-size: 16px;
-    }
-
-    .start-btn,
-    .restart-btn {
-        width: 100%;
-        padding: 15px;
-        margin-top: 15px;
-        border: none;
-        border-radius: 10px;
-        background: #222;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: 0.85;
-    }
-
-    .game {
-        display: none;
-    }
-
-    .turn-display {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 15px;
         padding: 12px;
-        border-radius: 10px;
-        background: #eee;
+    }
+
+    .target-board {
+        gap: 5px;
+    }
+
+    .target {
+        min-height: 65px;
+        border-radius: 8px;
+    }
+
+    .target-number {
+        font-size: 20px;
+    }
+
+    .target-status {
+        font-size: 10px;
+    }
+
+    .dart-buttons {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .players {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-bottom: 20px;
+        gap: 4px;
     }
 
     .player-card {
-        padding: 10px 5px;
-        border-radius: 10px;
-        background: #eee;
-        font-size: 13px;
-        font-weight: bold;
+        font-size: 11px;
+        padding: 7px 2px;
     }
 
-    .player-card.active {
-        outline: 3px solid #222;
-        transform: scale(1.03);
+    .player-symbol {
+        font-size: 20px;
     }
+}
 
-    .symbol {
-        display: block;
-        font-size: 24px;
-        margin-bottom: 3px;
-    }
-
-    .board {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
-        width: min(90vw, 500px);
-        aspect-ratio: 1;
-        margin: 0 auto;
-    }
-
-    .cell {
-        border: none;
-        border-radius: 10px;
-        background: #e5e5e5;
-        font-size: clamp(25px, 8vw, 55px);
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: transform 0.1s, background 0.2s;
-    }
-
-    .cell:hover {
-        background: #d5d5d5;
-    }
-
-    .cell:active {
-        transform: scale(0.95);
-    }
-
-    .cell.winner {
-        background: #222;
-        color: white;
-        animation: pulse 0.8s infinite alternate;
-    }
-
-    @keyframes pulse {
-        from {
-            transform: scale(1);
-        }
-        to {
-            transform: scale(1.05);
-        }
-    }
-
-    .winner-screen {
-        display: none;
-    }
-
-    .winner-screen h2 {
-        font-size: 32px;
-        margin: 20px 0;
-    }
-
-    .winner-symbol {
-        font-size: 80px;
-        font-weight: bold;
-    }
-
-    .draw {
-        font-size: 30px;
-        font-weight: bold;
-        margin: 30px 0;
-    }
-
-    @media (max-width: 500px) {
-        body {
-            padding: 10px;
-        }
-
-        .container {
-            padding: 15px;
-        }
-
-        h1 {
-            font-size: 1.6rem;
-        }
-
-        .players {
-            gap: 4px;
-        }
-
-        .player-card {
-            font-size: 11px;
-            padding: 7px 3px;
-        }
-
-        .symbol {
-            font-size: 20px;
-        }
-
-        .board {
-            gap: 4px;
-        }
-
-        .cell {
-            border-radius: 6px;
-        }
-    }
 </style>
 </head>
 
@@ -241,470 +302,1036 @@
 
 <div class="container">
 
-    <!-- SETUP SCREEN -->
-    <div class="setup" id="setupScreen">
+<!-- SETUP -->
 
-        <h1>Multi-Player Tic-Tac-Toe</h1>
+<div class="setup" id="setupScreen">
 
-        <h2>Select Players</h2>
+    <h1>🎯 Dartboard Connect 4</h1>
 
-        <div class="player-count">
-            <button class="count-btn" onclick="selectPlayerCount(2)">2</button>
-            <button class="count-btn" onclick="selectPlayerCount(3)">3</button>
-            <button class="count-btn active" onclick="selectPlayerCount(4)">4</button>
+    <h2>Select Number of Players</h2>
+
+    <div class="player-count">
+
+        <button class="count-btn"
+                onclick="selectPlayerCount(2)">
+            2
+        </button>
+
+        <button class="count-btn"
+                onclick="selectPlayerCount(3)">
+            3
+        </button>
+
+        <button class="count-btn active"
+                onclick="selectPlayerCount(4)">
+            4
+        </button>
+
+    </div>
+
+    <div id="nameInputs"></div>
+
+    <button class="primary-btn"
+            onclick="startGame()">
+
+        Start Game
+
+    </button>
+
+</div>
+
+
+<!-- GAME -->
+
+<div class="game" id="gameScreen">
+
+    <h1>🎯 Dartboard Connect 4</h1>
+
+    <div class="turn-display"
+         id="turnDisplay">
+    </div>
+
+    <div class="dart-counter"
+         id="dartCounter">
+    </div>
+
+    <div class="players"
+         id="playersDisplay">
+    </div>
+
+
+    <!-- TARGET BOARD -->
+
+    <div class="target-board"
+         id="targetBoard">
+    </div>
+
+
+    <div class="last-throw"
+         id="lastThrow">
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <h3>Select Your Dart</h3>
+
+        <div class="dart-buttons">
+
+            <button class="dart-btn"
+                    onclick="selectThrow('single')">
+                SINGLE
+            </button>
+
+            <button class="dart-btn"
+                    onclick="selectThrow('double')">
+                DOUBLE
+            </button>
+
+            <button class="dart-btn"
+                    onclick="selectThrow('triple')">
+                TRIPLE
+            </button>
+
+            <button class="dart-btn"
+                    onclick="selectThrow('bull')">
+                BULL
+            </button>
+
+            <button class="dart-btn miss"
+                    onclick="selectThrow('miss')">
+                MISS
+            </button>
+
         </div>
 
-        <div id="nameInputs"></div>
-
-        <button class="start-btn" onclick="startGame()">
-            Start Game
-        </button>
-
     </div>
 
 
-    <!-- GAME SCREEN -->
-    <div class="game" id="gameScreen">
+    <button class="secondary-btn"
+            onclick="newGame()">
 
-        <h1>Tic-Tac-Toe</h1>
+        New Game
 
-        <div class="turn-display" id="turnDisplay"></div>
+    </button>
 
-        <div class="players" id="playersDisplay"></div>
+</div>
 
-        <div class="board" id="board"></div>
 
-        <button class="restart-btn" onclick="resetGame()">
-            New Game
-        </button>
+<!-- WINNER -->
 
+<div class="winner-screen"
+     id="winnerScreen">
+
+    <h1>🏆 GAME OVER!</h1>
+
+    <div class="winner-symbol"
+         id="winnerSymbol">
     </div>
 
-
-    <!-- WINNER SCREEN -->
-    <div class="winner-screen" id="winnerScreen">
-
-        <h1>Game Over!</h1>
-
-        <div id="winnerContent"></div>
-
-        <button class="restart-btn" onclick="resetGame()">
-            Play Again
-        </button>
-
+    <div class="winner-name"
+         id="winnerName">
     </div>
+
+    <div class="winner-message">
+        Connected 4 targets and won the game!
+    </div>
+
+    <button class="primary-btn"
+            onclick="newGame()">
+
+        Play Again
+
+    </button>
+
+</div>
 
 </div>
 
 
 <script>
 
-const BOARD_SIZE = 5;
-const WIN_LENGTH = 4;
 
-const symbols = ["X", "O", "▲", "■"];
+/* =========================
+   GAME SETTINGS
+========================= */
+
+const targets = [
+    1,2,3,4,5,
+    6,7,8,9,10,
+    11,12,13,14,15,
+    16,17,18,19,20,
+    "BULL"
+];
+
+const symbols = [
+    "X",
+    "O",
+    "▲",
+    "■"
+];
 
 let playerCount = 4;
+
 let players = [];
-let board = [];
+
 let currentPlayer = 0;
+
+let dartNumber = 0;
+
 let gameOver = false;
 
 
-// PLAYER COUNT
+/*
+Each target stores:
+null = unclaimed
+0 = Player 1
+1 = Player 2
+2 = Player 3
+3 = Player 4
+*/
+
+let claimed = Array(21).fill(null);
+
+
+/* =========================
+   PLAYER SETUP
+========================= */
+
 function selectPlayerCount(count) {
 
     playerCount = count;
 
-    document.querySelectorAll(".count-btn").forEach(btn => {
-        btn.classList.remove("active");
-    });
+    document.querySelectorAll(".count-btn")
+        .forEach(btn => {
+
+            btn.classList.remove("active");
+
+        });
 
     event.target.classList.add("active");
 
     createNameInputs();
+
 }
 
 
-// CREATE NAME INPUTS
 function createNameInputs() {
 
-    const container = document.getElementById("nameInputs");
+    const container =
+        document.getElementById("nameInputs");
 
     container.innerHTML = "";
 
-    for (let i = 0; i < playerCount; i++) {
+    for(let i = 0; i < playerCount; i++) {
 
-        const input = document.createElement("input");
+        const input =
+            document.createElement("input");
 
-        input.className = "name-input";
-        input.id = "player" + i;
-        input.placeholder = "Player " + (i + 1) + " Name";
-        input.maxLength = 20;
+        input.className =
+            "name-input";
+
+        input.id =
+            "player" + i;
+
+        input.placeholder =
+            "Player " + (i + 1) + " Name";
 
         container.appendChild(input);
+
     }
+
 }
 
 
-// START GAME
+/* =========================
+   START GAME
+========================= */
+
 function startGame() {
 
     players = [];
 
-    for (let i = 0; i < playerCount; i++) {
+    for(let i = 0; i < playerCount; i++) {
 
-        const input = document.getElementById("player" + i);
+        const input =
+            document.getElementById(
+                "player" + i
+            );
 
-        let name = input.value.trim();
+        let name =
+            input.value.trim();
 
-        if (!name) {
-            name = "Player " + (i + 1);
+        if(!name) {
+
+            name =
+                "Player " + (i + 1);
+
         }
 
         players.push({
+
             name: name,
+
             symbol: symbols[i]
+
         });
+
     }
 
     currentPlayer = 0;
+
+    dartNumber = 0;
+
     gameOver = false;
 
-    document.getElementById("setupScreen").style.display = "none";
-    document.getElementById("winnerScreen").style.display = "none";
-    document.getElementById("gameScreen").style.display = "block";
+    claimed =
+        Array(21).fill(null);
 
-    createBoard();
-    updatePlayerDisplay();
-    updateTurnDisplay();
+
+    document.getElementById(
+        "setupScreen"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "winnerScreen"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "gameScreen"
+    ).style.display = "block";
+
+
+    createTargetBoard();
+
+    updateDisplay();
+
 }
 
 
-// CREATE BOARD
-function createBoard() {
+/* =========================
+   CREATE TARGET BOARD
+========================= */
 
-    board = Array(BOARD_SIZE * BOARD_SIZE).fill(null);
+function createTargetBoard() {
 
-    const boardElement = document.getElementById("board");
+    const board =
+        document.getElementById(
+            "targetBoard"
+        );
 
-    boardElement.innerHTML = "";
+    board.innerHTML = "";
 
-    for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
 
-        const cell = document.createElement("button");
+    for(let i = 0; i < 21; i++) {
 
-        cell.className = "cell";
+        const button =
+            document.createElement("button");
 
-        cell.dataset.index = i;
+        button.className =
+            "target";
 
-        cell.onclick = function() {
-            makeMove(i);
+
+        if(i === 20) {
+
+            button.classList.add("bull");
+
+        }
+
+
+        button.id =
+            "target-" + i;
+
+
+        button.onclick = function() {
+
+            targetClicked(i);
+
         };
 
-        boardElement.appendChild(cell);
+
+        button.innerHTML =
+
+            '<span class="target-number">' +
+
+            targets[i] +
+
+            '</span>' +
+
+            '<span class="target-status">' +
+
+            'Open' +
+
+            '</span>';
+
+
+        board.appendChild(button);
+
     }
+
 }
 
 
-// MAKE MOVE
-function makeMove(index) {
+/* =========================
+   TARGET CLICK
+========================= */
 
-    if (gameOver) return;
+function targetClicked(index) {
 
-    if (board[index] !== null) return;
+    if(gameOver) return;
 
-    board[index] = currentPlayer;
+    if(dartNumber >= 3) return;
 
-    const cells = document.querySelectorAll(".cell");
+    if(claimed[index] !== null) {
 
-    cells[index].textContent = players[currentPlayer].symbol;
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            "That target has already been claimed.";
 
-    if (checkWinner(index)) {
+        return;
 
-        gameOver = true;
+    }
 
-        highlightWinningCells(index);
+
+    selectThrow("single", index);
+
+}
+
+
+/* =========================
+   DART THROW
+========================= */
+
+function selectThrow(type, selectedIndex = null) {
+
+    if(gameOver) return;
+
+    if(dartNumber >= 3) return;
+
+
+    /* MISS */
+
+    if(type === "miss") {
+
+        dartNumber++;
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            players[currentPlayer].name +
+            " threw a MISS.";
+
+        finishDart();
+
+        return;
+
+    }
+
+
+    /* BULL */
+
+    if(type === "bull") {
+
+        if(claimed[20] !== null) {
+
+            document.getElementById(
+                "lastThrow"
+            ).textContent =
+                "Bull has already been claimed.";
+
+            return;
+
+        }
+
+        claimed[20] =
+            currentPlayer;
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            players[currentPlayer].name +
+            " claimed BULL.";
+
+        dartNumber++;
+
+        updateTargetBoard();
+
+        if(checkWinner()) {
+
+            endGame();
+
+            return;
+
+        }
+
+        finishDart();
+
+        return;
+
+    }
+
+
+    /* NUMBER TARGET */
+
+    let index =
+        selectedIndex;
+
+
+    if(index === null) {
+
+        const available = [];
+
+        for(let i = 0; i < 20; i++) {
+
+            if(claimed[i] === null) {
+
+                available.push(i);
+
+            }
+
+        }
+
+
+        if(available.length === 0) {
+
+            document.getElementById(
+                "lastThrow"
+            ).textContent =
+                "All number targets are claimed.";
+
+            return;
+
+        }
+
+
+        /*
+        If no target was selected,
+        ask player to select one.
+        */
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            "Select a number target first.";
+
+        return;
+
+    }
+
+
+    if(index < 0 || index > 19) {
+
+        return;
+
+    }
+
+
+    if(claimed[index] !== null) {
+
+        document.getElementById(
+            "lastThrow"
+        ).textContent =
+            "That target has already been claimed.";
+
+        return;
+
+    }
+
+
+    let spots = 1;
+
+
+    if(type === "double") {
+
+        spots = 2;
+
+    }
+
+
+    if(type === "triple") {
+
+        spots = 3;
+
+    }
+
+
+    /*
+    Claim the selected target
+    and additional consecutive
+    targets based on multiplier.
+    */
+
+    let claimedTargets = [];
+
+
+    for(let i = 0; i < spots; i++) {
+
+        let targetIndex =
+            (index + i) % 20;
+
+
+        if(
+            claimed[targetIndex] === null
+        ) {
+
+            claimed[targetIndex] =
+                currentPlayer;
+
+            claimedTargets.push(
+                targets[targetIndex]
+            );
+
+        }
+
+    }
+
+
+    dartNumber++;
+
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+
+        players[currentPlayer].name +
+
+        " hit " +
+
+        type.toUpperCase() +
+
+        " " +
+
+        targets[index] +
+
+        " → Claimed: " +
+
+        claimedTargets.join(", ");
+
+
+    updateTargetBoard();
+
+
+    if(checkWinner()) {
+
+        endGame();
+
+        return;
+
+    }
+
+
+    finishDart();
+
+}
+
+
+/* =========================
+   FINISH DART
+========================= */
+
+function finishDart() {
+
+    if(dartNumber >= 3) {
 
         setTimeout(() => {
-            showWinner(players[currentPlayer]);
+
+            nextPlayer();
+
         }, 700);
 
-        return;
+    } else {
+
+        updateDisplay();
+
     }
 
-    if (board.every(cell => cell !== null)) {
+}
 
-        gameOver = true;
 
-        setTimeout(() => {
-            showDraw();
-        }, 500);
+/* =========================
+   NEXT PLAYER
+========================= */
 
-        return;
-    }
+function nextPlayer() {
+
+    dartNumber = 0;
 
     currentPlayer++;
 
-    if (currentPlayer >= playerCount) {
+    if(
+        currentPlayer >= playerCount
+    ) {
+
         currentPlayer = 0;
+
     }
 
-    updatePlayerDisplay();
-    updateTurnDisplay();
+
+    updateDisplay();
+
+
+    document.getElementById(
+        "lastThrow"
+    ).textContent =
+
+        players[currentPlayer].name +
+
+        "'s turn.";
+
 }
 
 
-// CHECK WINNER
-function checkWinner(index) {
+/* =========================
+   CHECK WINNER
+========================= */
 
-    const row = Math.floor(index / BOARD_SIZE);
-    const col = index % BOARD_SIZE;
+function checkWinner() {
 
-    const directions = [
+    /*
+    Check 4 consecutive number
+    targets with wrap-around.
 
-        [0, 1],   // Horizontal
+    Bull is checked separately.
+    */
 
-        [1, 0],   // Vertical
-
-        [1, 1],   // Diagonal
-
-        [1, -1]   // Reverse diagonal
-
-    ];
-
-    for (let direction of directions) {
-
-        let count = 1;
-
-        count += countDirection(
-            row,
-            col,
-            direction[0],
-            direction[1]
-        );
-
-        count += countDirection(
-            row,
-            col,
-            -direction[0],
-            -direction[1]
-        );
-
-        if (count >= WIN_LENGTH) {
-            return true;
-        }
-    }
-
-    return false;
-}
+    for(let player = 0;
+        player < playerCount;
+        player++) {
 
 
-// COUNT CELLS IN DIRECTION
-function countDirection(row, col, rowDir, colDir) {
+        for(let start = 0;
+            start < 20;
+            start++) {
 
-    let count = 0;
 
-    let r = row + rowDir;
-    let c = col + colDir;
+            let count = 0;
 
-    while (
 
-        r >= 0 &&
-        r < BOARD_SIZE &&
-        c >= 0 &&
-        c < BOARD_SIZE
+            for(let offset = 0;
+                offset < 4;
+                offset++) {
 
-    ) {
 
-        const index = r * BOARD_SIZE + c;
+                let index =
+                    (start + offset) % 20;
 
-        if (board[index] !== currentPlayer) {
-            break;
+
+                if(
+                    claimed[index] === player
+                ) {
+
+                    count++;
+
+                }
+
+            }
+
+
+            if(count === 4) {
+
+                return player;
+
+            }
+
         }
 
-        count++;
 
-        r += rowDir;
-        c += colDir;
-    }
+        /*
+        Bull can count as an
+        additional target connected
+        to the final number 20.
+        */
 
-    return count;
-}
+        if(
+            claimed[20] === player &&
+            claimed[19] === player &&
+            claimed[18] === player &&
+            claimed[17] === player
+        ) {
 
+            return player;
 
-// FIND AND HIGHLIGHT WINNING CELLS
-function highlightWinningCells(index) {
-
-    const row = Math.floor(index / BOARD_SIZE);
-    const col = index % BOARD_SIZE;
-
-    const directions = [
-
-        [0, 1],
-        [1, 0],
-        [1, 1],
-        [1, -1]
-
-    ];
-
-    for (let direction of directions) {
-
-        let winningCells = [index];
-
-        let positive = getLine(
-            row,
-            col,
-            direction[0],
-            direction[1]
-        );
-
-        let negative = getLine(
-            row,
-            col,
-            -direction[0],
-            -direction[1]
-        );
-
-        winningCells = winningCells.concat(positive, negative);
-
-        if (winningCells.length >= WIN_LENGTH) {
-
-            const cells = document.querySelectorAll(".cell");
-
-            winningCells.forEach(i => {
-                cells[i].classList.add("winner");
-            });
-
-            return;
-        }
-    }
-}
-
-
-// GET LINE
-function getLine(row, col, rowDir, colDir) {
-
-    let result = [];
-
-    let r = row + rowDir;
-    let c = col + colDir;
-
-    while (
-
-        r >= 0 &&
-        r < BOARD_SIZE &&
-        c >= 0 &&
-        c < BOARD_SIZE
-
-    ) {
-
-        const index = r * BOARD_SIZE + c;
-
-        if (board[index] !== currentPlayer) {
-            break;
         }
 
-        result.push(index);
-
-        r += rowDir;
-        c += colDir;
     }
 
-    return result;
+
+    return null;
+
 }
 
 
-// UPDATE TURN
-function updateTurnDisplay() {
+/* =========================
+   END GAME
+========================= */
 
-    const player = players[currentPlayer];
+function endGame() {
 
-    document.getElementById("turnDisplay").textContent =
-        player.name + "'s Turn (" + player.symbol + ")";
+    const winner =
+        checkWinner();
+
+    if(winner === null) {
+
+        return;
+
+    }
+
+
+    gameOver = true;
+
+
+    document.getElementById(
+        "gameScreen"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "winnerScreen"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "winnerSymbol"
+    ).textContent =
+        players[winner].symbol;
+
+
+    document.getElementById(
+        "winnerName"
+    ).textContent =
+        players[winner].name +
+        " Wins!";
+
 }
 
 
-// UPDATE PLAYER CARDS
-function updatePlayerDisplay() {
+/* =========================
+   UPDATE BOARD
+========================= */
+
+function updateTargetBoard() {
+
+    for(let i = 0; i < 21; i++) {
+
+        const target =
+            document.getElementById(
+                "target-" + i
+            );
+
+
+        const status =
+            target.querySelector(
+                ".target-status"
+            );
+
+
+        if(
+            claimed[i] !== null
+        ) {
+
+            const player =
+                players[claimed[i]];
+
+
+            target.classList.add(
+                "claimed"
+            );
+
+
+            target.style.background =
+                getPlayerColor(
+                    claimed[i]
+                );
+
+
+            status.textContent =
+                player.name;
+
+
+        } else {
+
+            target.classList.remove(
+                "claimed"
+            );
+
+
+            target.style.background =
+                "";
+
+
+            status.textContent =
+                "Open";
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   UPDATE DISPLAY
+========================= */
+
+function updateDisplay() {
+
+    const player =
+        players[currentPlayer];
+
+
+    document.getElementById(
+        "turnDisplay"
+    ).textContent =
+
+        player.name +
+
+        "'s Turn " +
+
+        player.symbol;
+
+
+    document.getElementById(
+        "dartCounter"
+    ).textContent =
+
+        "Dart " +
+
+        (dartNumber + 1) +
+
+        " of 3";
+
 
     const container =
-        document.getElementById("playersDisplay");
+        document.getElementById(
+            "playersDisplay"
+        );
+
 
     container.innerHTML = "";
 
-    players.forEach((player, index) => {
 
-        const card = document.createElement("div");
+    players.forEach(
+        (player, index) => {
 
-        card.className = "player-card";
 
-        if (index === currentPlayer) {
-            card.classList.add("active");
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "player-card";
+
+
+            if(
+                index === currentPlayer
+            ) {
+
+                card.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            card.innerHTML =
+
+                '<span class="player-symbol">' +
+
+                player.symbol +
+
+                '</span>' +
+
+                player.name;
+
+
+            container.appendChild(
+                card
+            );
+
         }
+    );
 
-        card.innerHTML =
-            '<span class="symbol">' +
-            player.symbol +
-            '</span>' +
-            player.name;
 
-        container.appendChild(card);
-    });
+    updateTargetBoard();
+
 }
 
 
-// SHOW WINNER
-function showWinner(player) {
+/* =========================
+   PLAYER COLORS
+========================= */
 
-    document.getElementById("gameScreen").style.display = "none";
+function getPlayerColor(index) {
 
-    document.getElementById("winnerScreen").style.display = "block";
+    const colors = [
 
-    document.getElementById("winnerContent").innerHTML =
+        "#d62828",
 
-        '<div class="winner-symbol">' +
-        player.symbol +
-        '</div>' +
+        "#1565c0",
 
-        '<h2>' +
-        player.name +
-        ' Wins!</h2>' +
+        "#2e7d32",
 
-        '<p>Congratulations!</p>';
+        "#7b1fa2"
+
+    ];
+
+
+    return colors[index];
+
 }
 
 
-// SHOW DRAW
-function showDraw() {
+/* =========================
+   NEW GAME
+========================= */
 
-    document.getElementById("gameScreen").style.display = "none";
+function newGame() {
 
-    document.getElementById("winnerScreen").style.display = "block";
+    gameOver = false;
 
-    document.getElementById("winnerContent").innerHTML =
+    currentPlayer = 0;
 
-        '<div class="draw">It\'s a Draw!</div>' +
+    dartNumber = 0;
 
-        '<p>All spaces on the board are filled.</p>';
-}
+    players = [];
+
+    claimed =
+        Array(21).fill(null);
 
 
-// RESET GAME
-function resetGame() {
+    document.getElementById(
+        "gameScreen"
+    ).style.display = "none";
 
-    document.getElementById("winnerScreen").style.display = "none";
 
-    document.getElementById("gameScreen").style.display = "none";
+    document.getElementById(
+        "winnerScreen"
+    ).style.display = "none";
 
-    document.getElementById("setupScreen").style.display = "block";
+
+    document.getElementById(
+        "setupScreen"
+    ).style.display = "block";
+
 
     createNameInputs();
+
 }
 
 
-// INITIALIZE
+/* =========================
+   INITIALIZE
+========================= */
+
 createNameInputs();
+
 
 </script>
 
