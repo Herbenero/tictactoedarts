@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Player Tic-Tac-Toe</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 650px;
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+
+    h1 {
+        margin: 0 0 20px;
+        font-size: 2rem;
+    }
+
+    .setup {
+        display: block;
+    }
+
+    .setup h2 {
+        margin-bottom: 15px;
+    }
+
+    .player-count {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .count-btn {
+        width: 60px;
+        height: 50px;
+        border: none;
+        border-radius: 10px;
+        background: #ddd;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .count-btn.active {
+        background: #333;
+        color: white;
+    }
+
+    .name-input {
+        width: 100%;
+        padding: 14px;
+        margin: 7px 0;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+    }
+
+    .start-btn,
+    .restart-btn {
+        width: 100%;
+        padding: 15px;
+        margin-top: 15px;
+        border: none;
+        border-radius: 10px;
+        background: #222;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.85;
+    }
+
+    .game {
+        display: none;
+    }
+
+    .turn-display {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #eee;
+    }
+
+    .players {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .player-card {
+        padding: 10px 5px;
+        border-radius: 10px;
+        background: #eee;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .player-card.active {
+        outline: 3px solid #222;
+        transform: scale(1.03);
+    }
+
+    .symbol {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 3px;
+    }
+
+    .board {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+        width: min(90vw, 500px);
+        aspect-ratio: 1;
+        margin: 0 auto;
+    }
+
+    .cell {
+        border: none;
+        border-radius: 10px;
+        background: #e5e5e5;
+        font-size: clamp(25px, 8vw, 55px);
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.1s, background 0.2s;
+    }
+
+    .cell:hover {
+        background: #d5d5d5;
+    }
+
+    .cell:active {
+        transform: scale(0.95);
+    }
+
+    .cell.winner {
+        background: #222;
+        color: white;
+        animation: pulse 0.8s infinite alternate;
+    }
+
+    @keyframes pulse {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(1.05);
+        }
+    }
+
+    .winner-screen {
+        display: none;
+    }
+
+    .winner-screen h2 {
+        font-size: 32px;
+        margin: 20px 0;
+    }
+
+    .winner-symbol {
+        font-size: 80px;
+        font-weight: bold;
+    }
+
+    .draw {
+        font-size: 30px;
+        font-weight: bold;
+        margin: 30px 0;
+    }
+
+    @media (max-width: 500px) {
+        body {
+            padding: 10px;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+        }
+
+        .players {
+            gap: 4px;
+        }
+
+        .player-card {
+            font-size: 11px;
+            padding: 7px 3px;
+        }
+
+        .symbol {
+            font-size: 20px;
+        }
+
+        .board {
+            gap: 4px;
+        }
+
+        .cell {
+            border-radius: 6px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SETUP SCREEN -->
+    <div class="setup" id="setupScreen">
+
+        <h1>Multi-Player Tic-Tac-Toe</h1>
+
+        <h2>Select Players</h2>
+
+        <div class="player-count">
+            <button class="count-btn" onclick="selectPlayerCount(2)">2</button>
+            <button class="count-btn" onclick="selectPlayerCount(3)">3</button>
+            <button class="count-btn active" onclick="selectPlayerCount(4)">4</button>
+        </div>
+
+        <div id="nameInputs"></div>
+
+        <button class="start-btn" onclick="startGame()">
+            Start Game
+        </button>
+
+    </div>
+
+
+    <!-- GAME SCREEN -->
+    <div class="game" id="gameScreen">
+
+        <h1>Tic-Tac-Toe</h1>
+
+        <div class="turn-display" id="turnDisplay"></div>
+
+        <div class="players" id="playersDisplay"></div>
+
+        <div class="board" id="board"></div>
+
+        <button class="restart-btn" onclick="resetGame()">
+            New Game
+        </button>
+
+    </div>
+
+
+    <!-- WINNER SCREEN -->
+    <div class="winner-screen" id="winnerScreen">
+
+        <h1>Game Over!</h1>
+
+        <div id="winnerContent"></div>
+
+        <button class="restart-btn" onclick="resetGame()">
+            Play Again
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const BOARD_SIZE = 5;
+const WIN_LENGTH = 4;
+
+const symbols = ["X", "O", "▲", "■"];
+
+let playerCount = 4;
+let players = [];
+let board = [];
+let currentPlayer = 0;
+let gameOver = false;
+
+
+// PLAYER COUNT
+function selectPlayerCount(count) {
+
+    playerCount = count;
+
+    document.querySelectorAll(".count-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    event.target.classList.add("active");
+
+    createNameInputs();
+}
+
+
+// CREATE NAME INPUTS
+function createNameInputs() {
+
+    const container = document.getElementById("nameInputs");
+
+    container.innerHTML = "";
+
+    for (let i = 0; i < playerCount; i++) {
+
+        const input = document.createElement("input");
+
+        input.className = "name-input";
+        input.id = "player" + i;
+        input.placeholder = "Player " + (i + 1) + " Name";
+        input.maxLength = 20;
+
+        container.appendChild(input);
+    }
+}
+
+
+// START GAME
+function startGame() {
+
+    players = [];
+
+    for (let i = 0; i < playerCount; i++) {
+
+        const input = document.getElementById("player" + i);
+
+        let name = input.value.trim();
+
+        if (!name) {
+            name = "Player " + (i + 1);
+        }
+
+        players.push({
+            name: name,
+            symbol: symbols[i]
+        });
+    }
+
+    currentPlayer = 0;
+    gameOver = false;
+
+    document.getElementById("setupScreen").style.display = "none";
+    document.getElementById("winnerScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+
+    createBoard();
+    updatePlayerDisplay();
+    updateTurnDisplay();
+}
+
+
+// CREATE BOARD
+function createBoard() {
+
+    board = Array(BOARD_SIZE * BOARD_SIZE).fill(null);
+
+    const boardElement = document.getElementById("board");
+
+    boardElement.innerHTML = "";
+
+    for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
+
+        const cell = document.createElement("button");
+
+        cell.className = "cell";
+
+        cell.dataset.index = i;
+
+        cell.onclick = function() {
+            makeMove(i);
+        };
+
+        boardElement.appendChild(cell);
+    }
+}
+
+
+// MAKE MOVE
+function makeMove(index) {
+
+    if (gameOver) return;
+
+    if (board[index] !== null) return;
+
+    board[index] = currentPlayer;
+
+    const cells = document.querySelectorAll(".cell");
+
+    cells[index].textContent = players[currentPlayer].symbol;
+
+    if (checkWinner(index)) {
+
+        gameOver = true;
+
+        highlightWinningCells(index);
+
+        setTimeout(() => {
+            showWinner(players[currentPlayer]);
+        }, 700);
+
+        return;
+    }
+
+    if (board.every(cell => cell !== null)) {
+
+        gameOver = true;
+
+        setTimeout(() => {
+            showDraw();
+        }, 500);
+
+        return;
+    }
+
+    currentPlayer++;
+
+    if (currentPlayer >= playerCount) {
+        currentPlayer = 0;
+    }
+
+    updatePlayerDisplay();
+    updateTurnDisplay();
+}
+
+
+// CHECK WINNER
+function checkWinner(index) {
+
+    const row = Math.floor(index / BOARD_SIZE);
+    const col = index % BOARD_SIZE;
+
+    const directions = [
+
+        [0, 1],   // Horizontal
+
+        [1, 0],   // Vertical
+
+        [1, 1],   // Diagonal
+
+        [1, -1]   // Reverse diagonal
+
+    ];
+
+    for (let direction of directions) {
+
+        let count = 1;
+
+        count += countDirection(
+            row,
+            col,
+            direction[0],
+            direction[1]
+        );
+
+        count += countDirection(
+            row,
+            col,
+            -direction[0],
+            -direction[1]
+        );
+
+        if (count >= WIN_LENGTH) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+// COUNT CELLS IN DIRECTION
+function countDirection(row, col, rowDir, colDir) {
+
+    let count = 0;
+
+    let r = row + rowDir;
+    let c = col + colDir;
+
+    while (
+
+        r >= 0 &&
+        r < BOARD_SIZE &&
+        c >= 0 &&
+        c < BOARD_SIZE
+
+    ) {
+
+        const index = r * BOARD_SIZE + c;
+
+        if (board[index] !== currentPlayer) {
+            break;
+        }
+
+        count++;
+
+        r += rowDir;
+        c += colDir;
+    }
+
+    return count;
+}
+
+
+// FIND AND HIGHLIGHT WINNING CELLS
+function highlightWinningCells(index) {
+
+    const row = Math.floor(index / BOARD_SIZE);
+    const col = index % BOARD_SIZE;
+
+    const directions = [
+
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, -1]
+
+    ];
+
+    for (let direction of directions) {
+
+        let winningCells = [index];
+
+        let positive = getLine(
+            row,
+            col,
+            direction[0],
+            direction[1]
+        );
+
+        let negative = getLine(
+            row,
+            col,
+            -direction[0],
+            -direction[1]
+        );
+
+        winningCells = winningCells.concat(positive, negative);
+
+        if (winningCells.length >= WIN_LENGTH) {
+
+            const cells = document.querySelectorAll(".cell");
+
+            winningCells.forEach(i => {
+                cells[i].classList.add("winner");
+            });
+
+            return;
+        }
+    }
+}
+
+
+// GET LINE
+function getLine(row, col, rowDir, colDir) {
+
+    let result = [];
+
+    let r = row + rowDir;
+    let c = col + colDir;
+
+    while (
+
+        r >= 0 &&
+        r < BOARD_SIZE &&
+        c >= 0 &&
+        c < BOARD_SIZE
+
+    ) {
+
+        const index = r * BOARD_SIZE + c;
+
+        if (board[index] !== currentPlayer) {
+            break;
+        }
+
+        result.push(index);
+
+        r += rowDir;
+        c += colDir;
+    }
+
+    return result;
+}
+
+
+// UPDATE TURN
+function updateTurnDisplay() {
+
+    const player = players[currentPlayer];
+
+    document.getElementById("turnDisplay").textContent =
+        player.name + "'s Turn (" + player.symbol + ")";
+}
+
+
+// UPDATE PLAYER CARDS
+function updatePlayerDisplay() {
+
+    const container =
+        document.getElementById("playersDisplay");
+
+    container.innerHTML = "";
+
+    players.forEach((player, index) => {
+
+        const card = document.createElement("div");
+
+        card.className = "player-card";
+
+        if (index === currentPlayer) {
+            card.classList.add("active");
+        }
+
+        card.innerHTML =
+            '<span class="symbol">' +
+            player.symbol +
+            '</span>' +
+            player.name;
+
+        container.appendChild(card);
+    });
+}
+
+
+// SHOW WINNER
+function showWinner(player) {
+
+    document.getElementById("gameScreen").style.display = "none";
+
+    document.getElementById("winnerScreen").style.display = "block";
+
+    document.getElementById("winnerContent").innerHTML =
+
+        '<div class="winner-symbol">' +
+        player.symbol +
+        '</div>' +
+
+        '<h2>' +
+        player.name +
+        ' Wins!</h2>' +
+
+        '<p>Congratulations!</p>';
+}
+
+
+// SHOW DRAW
+function showDraw() {
+
+    document.getElementById("gameScreen").style.display = "none";
+
+    document.getElementById("winnerScreen").style.display = "block";
+
+    document.getElementById("winnerContent").innerHTML =
+
+        '<div class="draw">It\'s a Draw!</div>' +
+
+        '<p>All spaces on the board are filled.</p>';
+}
+
+
+// RESET GAME
+function resetGame() {
+
+    document.getElementById("winnerScreen").style.display = "none";
+
+    document.getElementById("gameScreen").style.display = "none";
+
+    document.getElementById("setupScreen").style.display = "block";
+
+    createNameInputs();
+}
+
+
+// INITIALIZE
+createNameInputs();
+
+</script>
+
+</body>
+</html>
