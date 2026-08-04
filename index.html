@@ -5,241 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hellcastle Tic-Tac-Toe</title>
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      margin: 0;
-      padding: 15px;
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f2f2f2;
-      color: #222;
-    }
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-    }
-    h1 {
-      text-align: center;
-      margin: 5px 0 20px;
-    }
-    .setup {
-      text-align: center;
-    }
-    .player-count {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .count-btn {
-      width: 65px;
-      height: 50px;
-      border: none;
-      border-radius: 10px;
-      background: #ddd;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .count-btn.active {
-      background: #222;
-      color: white;
-    }
-    .name-input {
-      display: block;
-      width: 100%;
-      max-width: 450px;
-      margin: 8px auto;
-      padding: 14px;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    .primary-btn, .secondary-btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .primary-btn {
-      background: #222;
-      color: white;
-    }
-    .secondary-btn {
-      background: #ddd;
-      color: #222;
-    }
-    .game {
-      display: none;
-    }
-    .turn-display {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      padding: 12px;
-      background: #eee;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .dart-counter {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .players {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .player-card {
-      padding: 10px 5px;
-      text-align: center;
-      background: #eee;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .player-card.active {
-      outline: 3px solid #222;
-    }
-    .player-symbol {
-      display: block;
-      font-size: 25px;
-      margin-bottom: 4px;
-    }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 15px; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; background: #f2f2f2; color: #222; }
+    .container { width: 100%; max-width: 900px; margin: auto; background: white; border-radius: 18px; padding: 20px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); }
+    h1 { text-align: center; margin: 5px 0 20px; }
+    .setup { text-align: center; }
+    .player-count { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
+    .count-btn { width: 65px; height: 50px; border: none; border-radius: 10px; background: #ddd; font-size: 20px; font-weight: bold; cursor: pointer; }
+    .count-btn.active { background: #222; color: white; }
+    .name-input { display: block; width: 100%; max-width: 450px; margin: 8px auto; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+    .primary-btn, .secondary-btn, .undo-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; margin-top: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .primary-btn { background: #222; color: white; }
+    .secondary-btn { background: #ddd; color: #222; }
+    .undo-btn { background: #e0a96d; color: white; }
+    .undo-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .action-row { display: flex; gap: 10px; margin-top: 15px; }
+    .game { display: none; }
+    .turn-display { text-align: center; font-size: 22px; font-weight: bold; padding: 12px; background: #eee; border-radius: 10px; margin-bottom: 10px; }
+    .dart-counter { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+    .players { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .player-card { padding: 10px 5px; text-align: center; background: #eee; border-radius: 10px; font-weight: bold; font-size: 14px; }
+    .player-card.active { outline: 3px solid #222; }
+    .player-symbol { display: block; font-size: 25px; margin-bottom: 4px; }
+    
     /* 5 x 4 SCOREBOARD */
-    .target-board {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      max-width: 650px;
-      margin: 0 auto;
-    }
-    .target {
-      min-height: 90px;
-      border: 3px solid #ccc;
-      border-radius: 12px;
-      background: #e6e6e6;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .target:hover {
-      transform: scale(1.03);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .target:active {
-      transform: scale(0.97);
-    }
-    .target-number {
-      display: block;
-      font-size: 28px;
-    }
-    .target-hits {
-      display: block;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-    .target-owner {
-      display: block;
-      font-size: 11px;
-      margin-top: 5px;
-    }
-    .target.random-highlight {
-      animation: pulse 0.7s infinite alternate;
-      outline: 5px solid #222;
-    }
-    @keyframes pulse {
-      from { transform: scale(1); }
-      to { transform: scale(1.05); }
-    }
-
+    .target-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-width: 650px; margin: 0 auto; }
+    .target { min-height: 90px; border: 3px solid #ccc; border-radius: 12px; background: #e6e6e6; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .target:hover { transform: scale(1.03); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .target:active { transform: scale(0.97); }
+    .target-number { display: block; font-size: 28px; }
+    .target-hits { display: block; font-size: 14px; margin-top: 5px; }
+    .target-owner { display: block; font-size: 11px; margin-top: 5px; }
+    .target.random-highlight { animation: pulse 0.7s infinite alternate; outline: 5px solid #222; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+    
     /* BULL WILD */
-    .bull-area {
-      max-width: 650px;
-      margin: 12px auto 20px;
-    }
-    .bull {
-      width: 100%;
-      min-height: 75px;
-      border-radius: 12px;
-      background: #333;
-      color: white;
-      text-align: center;
-      padding: 10px;
-    }
-    .bull-number {
-      font-size: 28px;
-      font-weight: bold;
-    }
-    .bull-info {
-      font-size: 12px;
-      margin-top: 4px;
-    }
-    .controls {
-      max-width: 650px;
-      margin: auto;
-    }
-    .controls h3 {
-      text-align: center;
-    }
-    .dart-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-    .dart-btn {
-      padding: 15px 5px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-      background: #ddd;
-    }
+    .bull-area { max-width: 650px; margin: 12px auto 20px; }
+    .bull { width: 100%; min-height: 75px; border-radius: 12px; background: #333; color: white; text-align: center; padding: 10px; cursor: pointer; border: 3px solid #333; }
+    .bull.random-highlight { animation: pulse 0.7s infinite alternate; border: 3px solid #fff; outline: 5px solid #222; }
+    .bull-number { font-size: 24px; font-weight: bold; }
+    .bull-info { font-size: 12px; margin-top: 4px; }
+    
+    .controls { max-width: 650px; margin: auto; }
+    .controls h3 { text-align: center; }
+    .dart-buttons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .dart-btn { padding: 15px 5px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; background: #ddd; }
     .dart-btn:hover { opacity: 0.8; }
-    .dart-btn.miss {
-      background: #999;
-      color: white;
-    }
-    .last-throw {
-      text-align: center;
-      margin: 15px 0;
-      min-height: 25px;
-      font-weight: bold;
-    }
-    .winner-screen {
-      display: none;
-      text-align: center;
-    }
-    .winner-symbol {
-      font-size: 80px;
-      margin: 20px;
-    }
-    .winner-name {
-      font-size: 36px;
-      font-weight: bold;
-    }
-    .winner-message {
-      font-size: 20px;
-      margin: 15px;
-    }
-
+    .dart-btn.bull-btn { background: #d90429; color: white; }
+    .dart-btn.miss { background: #999; color: white; }
+    .last-throw { text-align: center; margin: 15px 0; min-height: 25px; font-weight: bold; }
+    .winner-screen { display: none; text-align: center; }
+    .winner-symbol { font-size: 80px; margin: 20px; }
+    .winner-name { font-size: 36px; font-weight: bold; }
+    .winner-message { font-size: 20px; margin: 15px; }
+    
     @media(max-width:600px) {
       .container { padding: 12px; }
       .target-board { gap: 5px; }
@@ -247,7 +66,7 @@
       .target-number { font-size: 21px; }
       .target-hits { font-size: 12px; }
       .target-owner { font-size: 9px; }
-      .dart-buttons { grid-template-columns: repeat(2, 1fr); }
+      .dart-buttons { grid-template-columns: repeat(3, 1fr); }
       .players { gap: 4px; }
       .player-card { font-size: 11px; }
     }
@@ -274,38 +93,43 @@
       <div class="turn-display" id="turnDisplay"></div>
       <div class="dart-counter" id="dartCounter"></div>
       <div class="players" id="playersDisplay"></div>
-
+      
       <!-- 5 x 4 BOARD -->
       <div class="target-board" id="targetBoard"></div>
-
+      
       <!-- BULL -->
       <div class="bull-area">
-        <div class="bull">
-          <div class="bull-number">BULL — WILD</div>
-          <div class="bull-info">Bull can connect with any number in the bottom row.</div>
+        <div class="bull" id="bullTarget" onclick="selectBullTarget()">
+          <div class="bull-number" id="bullTitle">BULL — WILD (Unclaimed)</div>
+          <div class="bull-info" id="bullHits">0 / 3 Hits</div>
         </div>
       </div>
-
+      
       <div class="last-throw" id="lastThrow"></div>
-
+      
       <div class="controls">
         <h3>What did you hit?</h3>
         <div class="dart-buttons">
           <button class="dart-btn" onclick="throwDart(1)">SINGLE<br><small>1 Hit</small></button>
           <button class="dart-btn" onclick="throwDart(2)">DOUBLE<br><small>2 Hits</small></button>
           <button class="dart-btn" onclick="throwDart(3)">TRIPLE<br><small>3 Hits</small></button>
+          <button class="dart-btn bull-btn" onclick="throwBullHit()">BULL<br><small>1 Hit</small></button>
           <button class="dart-btn miss" onclick="throwMiss()">MISS</button>
         </div>
       </div>
-      <button class="secondary-btn" onclick="newGame()">New Game</button>
+
+      <div class="action-row">
+        <button class="undo-btn" id="undoBtn" onclick="undoLastAction()" disabled>↩ Undo Throw</button>
+        <button class="secondary-btn" onclick="newGame()">New Game</button>
+      </div>
     </div>
 
-    <!-- WINNER -->
+    <!-- WINNER / TIE -->
     <div class="winner-screen" id="winnerScreen">
-      <h1>🏆 GAME OVER!</h1>
+      <h1 id="winHeader">🏆 GAME OVER!</h1>
       <div class="winner-symbol" id="winnerSymbol"></div>
       <div class="winner-name" id="winnerName"></div>
-      <div class="winner-message">Connected 4 and won the game!</div>
+      <div class="winner-message" id="winnerMessage"></div>
       <button class="primary-btn" onclick="newGame()">Play Again</button>
     </div>
   </div>
@@ -318,17 +142,18 @@
     let currentPlayer = 0;
     let dartNumber = 0;
     let gameOver = false;
-
     let boardNumbers = [];
     let boardData = [];
     let bullData = { hits: 0, owner: null };
     let currentTarget = null;
+    let historyStack = [];
 
-    // Initialize inputs on page load
     createNameInputs();
 
-    function getPlayerColor(index) {
-      return colors[index % colors.length];
+    function getPlayerColor(index) { return colors[index % colors.length]; }
+
+    function getRequiredInARow() {
+      return playerCount >= 3 ? 3 : 4;
     }
 
     function selectPlayerCount(count) {
@@ -359,6 +184,43 @@
       }
     }
 
+    function saveState() {
+      historyStack.push(JSON.stringify({
+        currentPlayer,
+        dartNumber,
+        gameOver,
+        boardData,
+        bullData,
+        currentTarget,
+        lastThrowText: document.getElementById("lastThrow").textContent
+      }));
+      updateUndoButton();
+    }
+
+    function undoLastAction() {
+      if (historyStack.length === 0) return;
+      const state = JSON.parse(historyStack.pop());
+      currentPlayer = state.currentPlayer;
+      dartNumber = state.dartNumber;
+      gameOver = state.gameOver;
+      boardData = state.boardData;
+      bullData = state.bullData;
+      currentTarget = state.currentTarget;
+
+      document.getElementById("lastThrow").textContent = state.lastThrowText || "";
+      
+      updateBoard();
+      updateBullUI();
+      updateDisplay();
+      highlightCurrentTarget();
+      updateUndoButton();
+    }
+
+    function updateUndoButton() {
+      const btn = document.getElementById("undoBtn");
+      if (btn) btn.disabled = historyStack.length === 0;
+    }
+
     function startGame() {
       players = [];
       for (let i = 0; i < playerCount; i++) {
@@ -367,22 +229,23 @@
         if (!name) name = "Player " + (i + 1);
         players.push({ name: name, symbol: symbols[i] });
       }
-
       currentPlayer = 0;
       dartNumber = 0;
       gameOver = false;
-
+      historyStack = [];
       shuffleNumbers();
       boardData = boardNumbers.map(() => ({ hits: 0, owner: null }));
       bullData = { hits: 0, owner: null };
-
+      
       document.getElementById("setupScreen").style.display = "none";
       document.getElementById("winnerScreen").style.display = "none";
       document.getElementById("gameScreen").style.display = "block";
-
+      
       createBoard();
+      updateBullUI();
       chooseRandomTarget();
       updateDisplay();
+      updateUndoButton();
     }
 
     function createBoard() {
@@ -400,68 +263,69 @@
       }
     }
 
+    function highlightCurrentTarget() {
+      document.querySelectorAll(".target").forEach(t => t.classList.remove("random-highlight"));
+      const bullEl = document.getElementById("bullTarget");
+      if (bullEl) bullEl.classList.remove("random-highlight");
+
+      if (currentTarget === "bull") {
+        if (bullEl) bullEl.classList.add("random-highlight");
+      } else if (typeof currentTarget === "number") {
+        const targetEl = document.getElementById("target-" + currentTarget);
+        if (targetEl) targetEl.classList.add("random-highlight");
+      }
+    }
+
     function selectTarget(index) {
       if (gameOver) return;
       if (boardData[index].owner !== null) {
         document.getElementById("lastThrow").textContent = "That number has already been claimed.";
         return;
       }
+      saveState();
       currentTarget = index;
-      document.querySelectorAll(".target").forEach(t => t.classList.remove("random-highlight"));
-      const targetEl = document.getElementById("target-" + index);
-      if (targetEl) targetEl.classList.add("random-highlight");
-      document.getElementById("lastThrow").textContent = players[currentPlayer].name + " selected " + boardNumbers[index] + ". Choose Single, Double, or Triple.";
+      highlightCurrentTarget();
+      document.getElementById("lastThrow").textContent = players[currentPlayer].name + " selected " + boardNumbers[index] + ".";
+    }
+
+    function selectBullTarget() {
+      if (gameOver) return;
+      if (bullData.owner !== null) {
+        document.getElementById("lastThrow").textContent = "Bull has already been claimed.";
+        return;
+      }
+      saveState();
+      currentTarget = "bull";
+      highlightCurrentTarget();
+      document.getElementById("lastThrow").textContent = players[currentPlayer].name + " selected BULL.";
     }
 
     function chooseRandomTarget() {
       const available = [];
       for (let i = 0; i < boardData.length; i++) {
-        if (boardData[i].owner === null) {
-          available.push(i);
-        }
+        if (boardData[i].owner === null) available.push(i);
       }
+      if (bullData.owner === null) available.push("bull");
 
-      if (available.length === 0) {
-        if (bullData.owner === null) {
-          currentTarget = "bull";
-          const lastThrow = document.getElementById("lastThrow");
-          if (lastThrow) lastThrow.textContent = "All numbers claimed! Target is BULL.";
-        }
-        return;
-      }
+      if (available.length === 0) return;
 
       const randomPosition = Math.floor(Math.random() * available.length);
       currentTarget = available[randomPosition];
+      highlightCurrentTarget();
 
-      document.querySelectorAll(".target").forEach(t => t.classList.remove("random-highlight"));
-      const targetEl = document.getElementById("target-" + currentTarget);
-      if (targetEl) targetEl.classList.add("random-highlight");
-
+      const targetLabel = currentTarget === "bull" ? "BULL" : boardNumbers[currentTarget];
       const lastThrow = document.getElementById("lastThrow");
       if (lastThrow) {
-        lastThrow.textContent = players[currentPlayer].name + "'s target is " + boardNumbers[currentTarget] + ". Select Single, Double, or Triple.";
+        lastThrow.textContent = players[currentPlayer].name + "'s target is " + targetLabel + ".";
       }
     }
 
     function throwDart(hitCount) {
       if (gameOver || currentTarget === null) return;
+      saveState();
 
       if (currentTarget === "bull") {
-        bullData.hits += hitCount;
-        if (bullData.hits >= 3) {
-          bullData.hits = 3;
-          bullData.owner = currentPlayer;
-        }
-        dartNumber++;
-        let msg = players[currentPlayer].name + " hit Bull " + hitCount + " time" + (hitCount === 1 ? "" : "s");
-        if (bullData.owner !== null) msg += " — Bull claimed!";
-        document.getElementById("lastThrow").textContent = msg;
-
-        if (checkWinner(currentPlayer)) {
-          endGame(currentPlayer);
-          return;
-        }
-        finishDart();
+        applyBullHit(hitCount);
         return;
       }
 
@@ -475,33 +339,65 @@
 
       let message = players[currentPlayer].name + " hit " + boardNumbers[currentTarget] + " " + hitCount + " time" + (hitCount === 1 ? "" : "s");
       if (data.owner !== null) {
-        message += " — " + players[currentPlayer].name + " CLAIMED " + boardNumbers[currentTarget] + "!";
+        message += " — CLAIMED " + boardNumbers[currentTarget] + "!";
       } else {
         message += " — " + data.hits + " / 3 hits.";
       }
       document.getElementById("lastThrow").textContent = message;
 
       updateBoard();
+      checkGameStatus();
+    }
 
-      if (data.owner !== null && checkWinner(currentPlayer)) {
-        endGame(currentPlayer);
-        return;
+    function throwBullHit() {
+      if (gameOver) return;
+      saveState();
+      applyBullHit(1);
+    }
+
+    function applyBullHit(hitCount) {
+      bullData.hits += hitCount;
+      if (bullData.hits >= 3) {
+        bullData.hits = 3;
+        bullData.owner = currentPlayer;
       }
-      finishDart();
+      dartNumber++;
+
+      let msg = players[currentPlayer].name + " hit Bull " + hitCount + " time" + (hitCount === 1 ? "" : "s");
+      if (bullData.owner !== null) msg += " — Bull claimed!";
+      document.getElementById("lastThrow").textContent = msg;
+
+      updateBullUI();
+      checkGameStatus();
     }
 
     function throwMiss() {
       if (gameOver) return;
+      saveState();
       dartNumber++;
       document.getElementById("lastThrow").textContent = players[currentPlayer].name + " threw a MISS.";
       finishDart();
     }
 
+    function checkGameStatus() {
+      if (checkWinner(currentPlayer)) {
+        endGame(currentPlayer);
+        return;
+      }
+
+      if (isGameTie()) {
+        endGame(null);
+        return;
+      }
+
+      finishDart();
+    }
+
     function finishDart() {
       if (dartNumber >= 3) {
-        setTimeout(nextPlayer, 700);
+        setTimeout(nextPlayer, 500);
       } else {
-        setTimeout(chooseRandomTarget, 400);
+        setTimeout(chooseRandomTarget, 300);
         updateDisplay();
       }
     }
@@ -521,7 +417,6 @@
         const data = boardData[i];
         const hits = target.querySelector(".target-hits");
         const owner = target.querySelector(".target-owner");
-
         hits.textContent = data.hits + " / 3 Hits";
         if (data.owner !== null) {
           owner.textContent = players[data.owner].name;
@@ -535,12 +430,28 @@
       }
     }
 
+    function updateBullUI() {
+      const bullTitle = document.getElementById("bullTitle");
+      const bullHits = document.getElementById("bullHits");
+      const bullTarget = document.getElementById("bullTarget");
+      if (!bullTitle || !bullHits) return;
+
+      bullHits.textContent = bullData.hits + " / 3 Hits";
+      if (bullData.owner !== null) {
+        bullTitle.textContent = "BULL — Claimed by " + players[bullData.owner].name;
+        bullTarget.style.background = getPlayerColor(bullData.owner);
+      } else {
+        bullTitle.textContent = "BULL — WILD (Unclaimed)";
+        bullTarget.style.background = "#333";
+      }
+    }
+
     function updateDisplay() {
       if (!players.length) return;
       const player = players[currentPlayer];
-      document.getElementById("turnDisplay").textContent = player.name + "'s Turn " + player.symbol;
+      document.getElementById("turnDisplay").textContent = player.name + "'s Turn (" + player.symbol + ")";
       document.getElementById("dartCounter").textContent = "Dart " + (dartNumber + 1) + " of 3";
-
+      
       const container = document.getElementById("playersDisplay");
       container.innerHTML = "";
       players.forEach((p, index) => {
@@ -552,71 +463,120 @@
       });
     }
 
-    function checkWinner(player) {
+    function getWinningLines() {
+      const req = getRequiredInARow();
+      const lines = [];
+
+      // Horizontal lines
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c <= 5 - req; c++) {
+          const line = [];
+          for (let k = 0; k < req; k++) line.push(r * 5 + c + k);
+          lines.push(line);
+        }
+      }
+
+      // Vertical lines
+      for (let r = 0; r <= 4 - req; r++) {
+        for (let c = 0; c < 5; c++) {
+          const line = [];
+          for (let k = 0; k < req; k++) line.push((r + k) * 5 + c);
+          lines.push(line);
+        }
+      }
+
+      // Diagonal Down-Right
+      for (let r = 0; r <= 4 - req; r++) {
+        for (let c = 0; c <= 5 - req; c++) {
+          const line = [];
+          for (let k = 0; k < req; k++) line.push((r + k) * 5 + (c + k));
+          lines.push(line);
+        }
+      }
+
+      // Diagonal Down-Left
+      for (let r = 0; r <= 4 - req; r++) {
+        for (let c = req - 1; c < 5; c++) {
+          const line = [];
+          for (let k = 0; k < req; k++) line.push((r + k) * 5 + (c - k));
+          lines.push(line);
+        }
+      }
+
+      return lines;
+    }
+
+    function checkWinner(playerIndex) {
       const grid = boardData.map(cell => cell.owner);
+      const lines = getWinningLines();
 
-      // Horizontal
-      for (let row = 0; row < 4; row++) {
-        for (let col = 0; col <= 1; col++) {
-          let win = true;
-          for (let x = 0; x < 4; x++) {
-            if (grid[row * 5 + col + x] !== player) { win = false; break; }
+      for (const line of lines) {
+        if (line.every(idx => grid[idx] === playerIndex)) return true;
+      }
+
+      // Bull Wild Rule (Bottom Row connections with Bull)
+      if (bullData.owner === playerIndex) {
+        const req = getRequiredInARow();
+        const bottomRow = [15, 16, 17, 18, 19];
+        // Count continuous bottom row claims involving Bull wildcard
+        for (let i = 0; i <= 5 - (req - 1); i++) {
+          let count = 0;
+          for (let k = 0; k < (req - 1); k++) {
+            if (grid[bottomRow[i + k]] === playerIndex) count++;
           }
-          if (win) return true;
-        }
-      }
-
-      // Vertical
-      for (let row = 0; row <= 1; row++) {
-        for (let col = 0; col < 5; col++) {
-          let win = true;
-          for (let y = 0; y < 4; y++) {
-            if (grid[(row + y) * 5 + col] !== player) { win = false; break; }
-          }
-          if (win) return true;
-        }
-      }
-
-      // Diagonal down-right
-      for (let row = 0; row <= 0; row++) {
-        for (let col = 0; col <= 1; col++) {
-          let win = true;
-          for (let x = 0; x < 4; x++) {
-            if (grid[(row + x) * 5 + (col + x)] !== player) { win = false; break; }
-          }
-          if (win) return true;
-        }
-      }
-
-      // Diagonal down-left
-      for (let col = 3; col < 5; col++) {
-        let win = true;
-        for (let x = 0; x < 4; x++) {
-          if (grid[x * 5 + (col - x)] !== player) { win = false; break; }
-        }
-        if (win) return true;
-      }
-
-      // Bull Wild Rule
-      if (bullData.owner === player) {
-        for (let bottom = 15; bottom < 20; bottom++) {
-          const col = bottom % 5;
-          if (col >= 3 && grid[bottom] === player && grid[bottom - 1] === player && grid[bottom - 2] === player) return true;
-          if (col <= 1 && grid[bottom] === player && grid[bottom + 1] === player && grid[bottom + 2] === player) return true;
-          if (grid[bottom] === player && grid[bottom - 5] === player && grid[bottom - 10] === player) return true;
+          if (count === (req - 1)) return true;
         }
       }
 
       return false;
     }
 
+    function isGameTie() {
+      const grid = boardData.map(cell => cell.owner);
+      const lines = getWinningLines();
+
+      // Check if any player can still complete any winning line
+      for (let p = 0; p < playerCount; p++) {
+        for (const line of lines) {
+          const canWinLine = line.every(idx => grid[idx] === null || grid[idx] === p);
+          if (canWinLine) return false;
+        }
+
+        // Check Bull wild bottom line possibilities
+        if (bullData.owner === null || bullData.owner === p) {
+          const req = getRequiredInARow();
+          const bottomRow = [15, 16, 17, 18, 19];
+          for (let i = 0; i <= 5 - (req - 1); i++) {
+            let possible = true;
+            for (let k = 0; k < (req - 1); k++) {
+              const owner = grid[bottomRow[i + k]];
+              if (owner !== null && owner !== p) possible = false;
+            }
+            if (possible) return false;
+          }
+        }
+      }
+
+      return true; // No winning lines remain achievable by any player
+    }
+
     function endGame(winnerIndex) {
       gameOver = true;
-      const winner = players[winnerIndex];
       document.getElementById("gameScreen").style.display = "none";
-      document.getElementById("winnerSymbol").textContent = winner.symbol;
-      document.getElementById("winnerName").textContent = winner.name;
       document.getElementById("winnerScreen").style.display = "block";
+
+      if (winnerIndex !== null) {
+        const winner = players[winnerIndex];
+        document.getElementById("winHeader").textContent = "🏆 GAME OVER!";
+        document.getElementById("winnerSymbol").textContent = winner.symbol;
+        document.getElementById("winnerName").textContent = winner.name;
+        document.getElementById("winnerMessage").textContent = `Connected ${getRequiredInARow()} in a row and won!`;
+      } else {
+        document.getElementById("winHeader").textContent = "🤝 GAME OVER!";
+        document.getElementById("winnerSymbol").textContent = "⚖️";
+        document.getElementById("winnerName").textContent = "IT'S A TIE!";
+        document.getElementById("winnerMessage").textContent = "No remaining ways for any player to win.";
+      }
     }
 
     function newGame() {
