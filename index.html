@@ -5,254 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hellcastle Tic-Tac-Toe</title>
   <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
-      margin: 0;
-      padding: 15px;
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f2f2f2;
-      color: #222;
-    }
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
-      position: relative;
-    }
-    h1 {
-      text-align: center;
-      margin: 5px 0 20px;
-    }
-    .setup {
-      text-align: center;
-    }
-    .player-count {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .count-btn {
-      width: 65px;
-      height: 50px;
-      border: none;
-      border-radius: 10px;
-      background: #ddd;
-      font-size: 20px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .count-btn.active {
-      background: #222;
-      color: white;
-    }
-    .name-input {
-      display: block;
-      width: 100%;
-      max-width: 450px;
-      margin: 8px auto;
-      padding: 14px;
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-    }
-    .primary-btn, .secondary-btn, .undo-btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .primary-btn {
-      background: #222;
-      color: white;
-    }
-    .secondary-btn {
-      background: #ddd;
-      color: #222;
-    }
-    .undo-btn {
-      background: #e0a96d;
-      color: white;
-    }
-    .undo-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .action-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    .game {
-      display: none;
-    }
-    .turn-display {
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      padding: 12px;
-      background: #eee;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .dart-counter {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .players {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .player-card {
-      padding: 10px 5px;
-      text-align: center;
-      background: #eee;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .player-card.active {
-      outline: 3px solid #222;
-    }
-    .player-symbol {
-      display: block;
-      font-size: 25px;
-      margin-bottom: 4px;
-    }
-
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 15px; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; background: #f2f2f2; color: #222; }
+    .container { width: 100%; max-width: 900px; margin: auto; background: white; border-radius: 18px; padding: 20px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); position: relative; }
+    h1 { text-align: center; margin: 5px 0 20px; }
+    .setup { text-align: center; }
+    .option-group { margin: 15px 0; }
+    .option-group h3 { margin-bottom: 8px; }
+    .selector-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+    .count-btn, .mode-btn { padding: 10px 20px; border: none; border-radius: 10px; background: #ddd; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .count-btn.active, .mode-btn.active { background: #222; color: white; }
+    .name-input { display: block; width: 100%; max-width: 450px; margin: 8px auto; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+    .primary-btn, .secondary-btn, .undo-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; margin-top: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .primary-btn { background: #222; color: white; }
+    .secondary-btn { background: #ddd; color: #222; }
+    .undo-btn { background: #e0a96d; color: white; }
+    .undo-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .action-row { display: flex; gap: 10px; margin-top: 15px; }
+    .game { display: none; }
+    .turn-display { text-align: center; font-size: 22px; font-weight: bold; padding: 12px; background: #eee; border-radius: 10px; margin-bottom: 10px; }
+    .dart-counter { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+    .players { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .player-card { padding: 10px 5px; text-align: center; background: #eee; border-radius: 10px; font-weight: bold; font-size: 14px; }
+    .player-card.active { outline: 3px solid #222; }
+    .player-symbol { display: block; font-size: 25px; margin-bottom: 4px; }
+    
     /* 5 x 4 SCOREBOARD */
-    .target-board {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      max-width: 650px;
-      margin: 0 auto;
-    }
-    .target {
-      min-height: 90px;
-      border: 3px solid #ccc;
-      border-radius: 12px;
-      background: #e6e6e6;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .target:hover {
-      transform: scale(1.03);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .target:active {
-      transform: scale(0.97);
-    }
-    .target-number {
-      display: block;
-      font-size: 28px;
-    }
-    .target-hits {
-      display: block;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-    .target-owner {
-      display: block;
-      font-size: 11px;
-      margin-top: 5px;
-    }
-    .target.random-highlight {
-      animation: pulse 0.7s infinite alternate;
-      outline: 5px solid #222;
-    }
-    @keyframes pulse {
-      from { transform: scale(1); }
-      to { transform: scale(1.05); }
-    }
-    .controls {
-      max-width: 650px;
-      margin: auto;
-    }
-    .controls h3 {
-      text-align: center;
-    }
-    .dart-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-    .dart-btn {
-      padding: 15px 5px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
-      background: #ddd;
-    }
-    .dart-btn:hover {
-      opacity: 0.8;
-    }
-    .dart-btn.miss {
-      background: #999;
-      color: white;
-    }
-    .last-throw {
-      text-align: center;
-      margin: 15px 0;
-      min-height: 25px;
-      font-weight: bold;
-    }
-
+    .target-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-width: 650px; margin: 0 auto; }
+    .target { min-height: 90px; border: 3px solid #ccc; border-radius: 12px; background: #e6e6e6; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+    .target:hover { transform: scale(1.03); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .target:active { transform: scale(0.97); }
+    .target-number { display: block; font-size: 28px; }
+    .target-hits { display: block; font-size: 14px; margin-top: 5px; }
+    .target-owner { display: block; font-size: 11px; margin-top: 5px; }
+    .target.random-highlight { animation: pulse 0.7s infinite alternate; outline: 5px solid #222; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+    
+    .controls { max-width: 650px; margin: auto; }
+    .controls h3 { text-align: center; }
+    .dart-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .dart-buttons.has-quad { grid-template-columns: repeat(5, 1fr); }
+    .dart-btn { padding: 15px 5px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; background: #ddd; }
+    .dart-btn:hover { opacity: 0.8; }
+    .dart-btn.quad-btn { background: #d90429; color: white; }
+    .dart-btn.miss { background: #999; color: white; }
+    .last-throw { text-align: center; margin: 15px 0; min-height: 25px; font-weight: bold; }
+    
     /* WINNER OVERLAY MODAL */
-    .winner-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .winner-card {
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      text-align: center;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    .winner-symbol {
-      font-size: 80px;
-      margin: 10px 0;
-    }
-    .winner-name {
-      font-size: 36px;
-      font-weight: bold;
-    }
-    .winner-message {
-      font-size: 20px;
-      margin: 15px 0 25px;
-    }
-
+    .winner-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+    .winner-card { background: white; padding: 30px; border-radius: 18px; text-align: center; max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .winner-symbol { font-size: 80px; margin: 10px 0; }
+    .winner-name { font-size: 36px; font-weight: bold; }
+    .winner-message { font-size: 20px; margin: 15px 0 25px; }
+    
     @media(max-width:600px) {
       .container { padding: 12px; }
       .target-board { gap: 5px; }
@@ -261,6 +66,7 @@
       .target-hits { font-size: 12px; }
       .target-owner { font-size: 9px; }
       .dart-buttons { grid-template-columns: repeat(2, 1fr); }
+      .dart-buttons.has-quad { grid-template-columns: repeat(2, 1fr); }
       .players { gap: 4px; }
       .player-card { font-size: 11px; }
     }
@@ -271,12 +77,24 @@
     <!-- SETUP -->
     <div class="setup" id="setupScreen">
       <h1>🎯 Hellcastle Tic-Tac-Toe</h1>
-      <h2>Select Number of Players</h2>
-      <div class="player-count">
-        <button class="count-btn" onclick="selectPlayerCount(2)">2</button>
-        <button class="count-btn" onclick="selectPlayerCount(3)">3</button>
-        <button class="count-btn active" onclick="selectPlayerCount(4)">4</button>
+      
+      <div class="option-group">
+        <h3>Select Board Type</h3>
+        <div class="selector-row">
+          <button class="mode-btn active" onclick="selectBoardType('basic')">Basic</button>
+          <button class="mode-btn" onclick="selectBoardType('quad')">Quad Board</button>
+        </div>
       </div>
+
+      <div class="option-group">
+        <h3>Select Number of Players</h3>
+        <div class="selector-row">
+          <button class="count-btn" onclick="selectPlayerCount(2)">2</button>
+          <button class="count-btn" onclick="selectPlayerCount(3)">3</button>
+          <button class="count-btn active" onclick="selectPlayerCount(4)">4</button>
+        </div>
+      </div>
+
       <div id="nameInputs"></div>
       <button class="primary-btn" onclick="startGame()">Start Game</button>
     </div>
@@ -290,14 +108,16 @@
 
       <!-- 5 x 4 BOARD -->
       <div class="target-board" id="targetBoard"></div>
+
       <div class="last-throw" id="lastThrow"></div>
 
       <div class="controls" id="gameControls">
         <h3>What did you hit?</h3>
-        <div class="dart-buttons">
+        <div class="dart-buttons" id="dartButtons">
           <button class="dart-btn" onclick="throwDart(1)">SINGLE<br><small>1 Hit</small></button>
           <button class="dart-btn" onclick="throwDart(2)">DOUBLE<br><small>2 Hits</small></button>
           <button class="dart-btn" onclick="throwDart(3)">TRIPLE<br><small>3 Hits</small></button>
+          <button class="dart-btn quad-btn" id="quadBtn" style="display:none;" onclick="throwDart(4)">QUAD<br><small>4 Hits</small></button>
           <button class="dart-btn miss" onclick="throwMiss()">MISS</button>
         </div>
       </div>
@@ -327,6 +147,7 @@
     const colors = ["#e63946", "#1d3557", "#2a9d8f", "#e76f51"];
 
     let playerCount = 4;
+    let boardType = "basic"; // "basic" or "quad"
     let players = [];
     let currentPlayer = 0;
     let dartNumber = 0;
@@ -344,6 +165,12 @@
 
     function getRequiredInARow() {
       return playerCount >= 3 ? 3 : 4;
+    }
+
+    function selectBoardType(type) {
+      boardType = type;
+      document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
     }
 
     function selectPlayerCount(count) {
@@ -388,18 +215,19 @@
 
     function undoLastAction() {
       if (historyStack.length === 0) return;
+
       const state = JSON.parse(historyStack.pop());
       currentPlayer = state.currentPlayer;
       dartNumber = state.dartNumber;
       gameOver = state.gameOver;
       boardData = state.boardData;
       currentTarget = state.currentTarget;
-      
+
       document.getElementById("lastThrow").textContent = state.lastThrowText || "";
       document.getElementById("winnerScreen").style.display = "none";
       document.getElementById("viewWinnerBtn").style.display = "none";
       document.getElementById("gameControls").style.display = "block";
-      
+
       updateBoard();
       updateDisplay();
       highlightCurrentTarget();
@@ -428,6 +256,17 @@
       shuffleNumbers();
       boardData = boardNumbers.map(() => ({ hits: 0, owner: null }));
 
+      // Setup board UI controls based on selected board mode
+      const quadBtn = document.getElementById("quadBtn");
+      const dartButtonsContainer = document.getElementById("dartButtons");
+      if (boardType === "quad") {
+        quadBtn.style.display = "block";
+        dartButtonsContainer.classList.add("has-quad");
+      } else {
+        quadBtn.style.display = "none";
+        dartButtonsContainer.classList.remove("has-quad");
+      }
+
       document.getElementById("setupScreen").style.display = "none";
       document.getElementById("winnerScreen").style.display = "none";
       document.getElementById("viewWinnerBtn").style.display = "none";
@@ -443,13 +282,12 @@
     function createBoard() {
       const board = document.getElementById("targetBoard");
       board.innerHTML = "";
+
       for (let i = 0; i < 20; i++) {
         const target = document.createElement("button");
         target.className = "target";
         target.id = "target-" + i;
-        target.onclick = function() {
-          selectTarget(i);
-        };
+        target.onclick = function() { selectTarget(i); };
         target.innerHTML = 
           '<span class="target-number">' + boardNumbers[i] + '</span>' +
           '<span class="target-hits">0 / 3 Hits</span>' +
@@ -483,6 +321,7 @@
       for (let i = 0; i < boardData.length; i++) {
         if (boardData[i].owner === null) available.push(i);
       }
+
       if (available.length === 0) return;
 
       const randomPosition = Math.floor(Math.random() * available.length);
@@ -497,6 +336,7 @@
 
     function throwDart(hitCount) {
       if (gameOver || currentTarget === null) return;
+
       saveState();
 
       const data = boardData[currentTarget];
@@ -517,6 +357,7 @@
       }
 
       document.getElementById("lastThrow").textContent = message;
+
       updateBoard();
       checkGameStatus();
     }
@@ -596,9 +437,7 @@
         const card = document.createElement("div");
         card.className = "player-card";
         if (index === currentPlayer) card.classList.add("active");
-        card.innerHTML = 
-          '<span class="player-symbol">' + p.symbol + '</span>' +
-          p.name;
+        card.innerHTML = '<span class="player-symbol">' + p.symbol + '</span>' + p.name;
         container.appendChild(card);
       });
     }
@@ -671,8 +510,6 @@
 
     function endGame(winnerIndex) {
       gameOver = true;
-      
-      // Hide throw controls, highlight target, and show modal overlay
       document.getElementById("gameControls").style.display = "none";
       highlightCurrentTarget();
 
