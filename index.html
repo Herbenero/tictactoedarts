@@ -6,8 +6,24 @@
   <title>Hellcastle Tic-Tac-Toe</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; padding: 15px; min-height: 100vh; font-family: Arial, Helvetica, sans-serif; background: #f2f2f2; color: #222; }
-    .container { width: 100%; max-width: 900px; margin: auto; background: white; border-radius: 18px; padding: 20px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); position: relative; }
+    body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    background-color: var(--bg);
+    background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)), url('TicTacToe.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--ink);
+    padding: 18px;
+    min-height: 100vh;
+}
+    .container {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
     h1 { text-align: center; margin: 5px 0 20px; }
     .setup { text-align: center; }
     .option-group { margin: 15px 0; }
