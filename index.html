@@ -7,7 +7,11 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
+            background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)), url('TicTacToe.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: #e0e0e0;
             margin: 0;
             padding: 20px;
@@ -19,10 +23,11 @@
         .container {
             width: 100%;
             max-width: 600px;
-            background: #1e1e1e;
+            background: rgba(30, 30, 30, 0.92);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
         }
         h1 {
             text-align: center;
