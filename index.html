@@ -3,275 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hellcastle Tic-Tac-Toe</title>
+    <title>Hellcastle Tic-Tac-Toe Darts</title>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            margin: 0; 
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif; 
-            background-color: var(--bg, #12100b); 
-            background-image: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)), url('TicTacToe.png'); 
-            background-size: cover; 
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-attachment: fixed; 
-            color: var(--ink, #ffffff); 
-            padding: 18px; 
-            min-height: 100vh; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .container { width: 100%; max-width: 850px; margin: 0 auto; }
-        h1 { text-align: center; margin: 5px 0 20px; }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+        h1 {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        .setup, .game {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option-group label {
+            font-weight: bold;
+            color: #b0b0b0;
+        }
+        .player-count-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .count-btn, .primary-btn, .secondary-btn, .hit-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .count-btn {
+            flex: 1;
+            background: #333;
+            color: #fff;
+        }
+        .count-btn.active {
+            background: #ffcc00;
+            color: #121212;
+        }
+        .name-input {
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .primary-btn {
+            background: #ffcc00;
+            color: #121212;
+            margin-top: 10px;
+        }
+        .primary-btn:hover { background: #e6b800; }
+        .secondary-btn {
+            background: #444;
+            color: #fff;
+        }
+        .secondary-btn:hover { background: #555; }
         
-        /* SETUP SCREEN STYLES (Red Text) */
-        .setup { text-align: center; color: #ff3333; }
-        .setup h1, .setup h3, .setup label { color: #ff3333; }
-        .option-group { margin: 15px 0; }
-        .option-group h3 { margin-bottom: 8px; }
-        .selector-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .count-btn, .mode-btn { padding: 10px 20px; border: none; border-radius: 10px; background: #ddd; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .count-btn.active, .mode-btn.active { background: #222; color: white; }
-        .name-input { display: block; width: 100%; max-width: 450px; margin: 8px auto; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
-        
-        /* BUTTON STYLES */
-        .primary-btn, .secondary-btn, .undo-btn { width: 100%; padding: 15px; border: none; border-radius: 10px; margin-top: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .setup .primary-btn { background: #8a2be2; color: white; }
-        .setup .primary-btn:hover { background: #7322bf; }
-        .secondary-btn { background: #ddd; color: #222; }
-        .undo-btn { background: #e0a96d; color: white; }
-        
-        /* GAME INTERFACE STYLES */
-        .game { display: none; }
-        .turn-display { text-align: center; font-size: 22px; font-weight: bold; padding: 12px; background: #eee; color: #222; border-radius: 10px; margin-bottom: 10px; }
-        .dart-counter { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-        .dart-label { color: #008080; }
-        
-        .players { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-        .player-card { padding: 12px 5px; text-align: center; background: #eee; color: #222; border-radius: 10px; font-weight: bold; font-size: 14px; transition: all 0.2s; border: 3px solid transparent; }
-        .player-card.active { border-color: #222; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .player-symbol { display: block; font-size: 25px; margin-bottom: 4px; }
-        
-        /* 5 x 4 BOARD */
-        .target-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; max-width: 650px; margin: 0 auto; }
-        .target { min-height: 90px; border: 3px solid #ccc; border-radius: 12px; background: #e6e6e6; color: #222; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-align: center; padding: 6px; display: flex; flex-direction: column; justify-content: center; }
-        .target:hover { transform: scale(1.03); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
-        .target.selected { border-color: #8a2be2 !important; background: #dcd0ff !important; }
-        .target-number { display: block; font-size: 28px; }
-        .target-hits { display: block; font-size: 13px; margin-top: 3px; }
-        .target-owner { display: block; font-size: 11px; margin-top: 3px; font-weight: bold; }
-        
-        .controls { max-width: 650px; margin: 20px auto 0; }
-        .controls h3 { text-align: center; }
-        .hit-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .hit-btn { padding: 15px 5px; font-size: 16px; font-weight: bold; border: none; border-radius: 10px; background: #eee; color: #222; cursor: pointer; }
-        .undo-row-btn { grid-column: span 4; background: #e0a96d; color: white; }
+        .turn-display {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 6px;
+        }
+        .dart-counter {
+            text-align: center;
+            color: #aaa;
+            font-size: 14px;
+        }
+        .players {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        .player-card {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            background: #2a2a2a;
+            border: 2px solid transparent;
+            font-size: 14px;
+        }
+        .player-card.active {
+            border-color: #ffcc00;
+            transform: scale(1.02);
+        }
+        .target-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .target {
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 6px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 55px;
+            transition: all 0.2s;
+        }
+        .target.selected {
+            border-color: #ffcc00;
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+        .target-number {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .target-hits {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+        .target-owner {
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .controls {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .controls h3 {
+            margin: 0;
+            font-size: 15px;
+            text-align: center;
+            color: #bbb;
+        }
+        .hit-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .hit-btn {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .hit-btn:hover { background: #444; }
+        .hit-btn small { display: block; font-size: 10px; color: #aaa; font-weight: normal; }
+        .undo-row-btn {
+            grid-column: span 2;
+            background: #5a2e2e;
+        }
+        .undo-row-btn:hover { background: #6e3838; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- SETUP SCREEN -->
-        <div class="setup" id="setup-screen">
-            <h1>🎯 Hellcastle Tic-Tac-Toe</h1>
-            <div class="option-group">
-                <h3>Number of Players</h3>
-                <div class="selector-row">
-                    <button class="count-btn active" onclick="setPlayers(2)">2 Players</button>
-                    <button class="count-btn" onclick="setPlayers(3)">3 Players</button>
-                    <button class="count-btn" onclick="setPlayers(4)">4 Players</button>
-                </div>
+
+<div class="container">
+    <!-- SETUP SCREEN -->
+    <div class="setup" id="setup-screen">
+        <h1>🎯 Hellcastle Tic-Tac-Toe</h1>
+        <div class="option-group">
+            <label>Select Player Count</label>
+            <div class="player-count-buttons">
+                <button class="count-btn active" onclick="setPlayers(2)">2 Players</button>
+                <button class="count-btn" onclick="setPlayers(3)">3 Players</button>
+                <button class="count-btn" onclick="setPlayers(4)">4 Players</button>
             </div>
-            <div class="option-group" id="player-inputs">
-                <input type="text" class="name-input" id="p1-name" value="herb" placeholder="Player 1 Name">
-                <input type="text" class="name-input" id="p2-name" value="Kelly" placeholder="Player 2 Name">
-                <input type="text" class="name-input" id="p3-name" value="Player 3" placeholder="Player 3 Name" style="display:none;">
-                <input type="text" class="name-input" id="p4-name" value="Player 4" placeholder="Player 4 Name" style="display:none;">
-            </div>
-            <button class="primary-btn" onclick="startGame()">Start Game</button>
         </div>
+        <div class="option-group" id="player-inputs">
+            <input type="text" class="name-input" id="p1-name" value="herb" placeholder="Player 1 Name">
+            <input type="text" class="name-input" id="p2-name" value="Kelly" placeholder="Player 2 Name">
+            <input type="text" class="name-input" id="p3-name" value="Player 3" placeholder="Player 3 Name" style="display: none;">
+            <input type="text" class="name-input" id="p4-name" value="Player 4" placeholder="Player 4 Name" style="display: none;">
+        </div>
+        <button class="primary-btn" onclick="startGame()">Start Game</button>
+    </div>
 
-        <!-- GAME SCREEN -->
-        <div class="game" id="game-screen">
-            <h1>🎯 Hellcastle Tic-Tac-Toe</h1>
-            <div class="turn-display" id="turn-indicator">herb's Turn (X)</div>
-            <div class="dart-counter"><span class="dart-label">Dart:</span> <span id="dart-num">1</span> of 3</div>
-            
-            <div class="players" id="player-cards"></div>
-            <div class="target-board" id="board"></div>
+    <!-- GAME SCREEN -->
+    <div class="game" id="game-screen" style="display: none;">
+        <h1>🎯 Hellcastle Tic-Tac-Toe</h1>
+        <div class="turn-display" id="turn-indicator">herb's Turn (X)</div>
+        <div class="dart-counter">
+            <span class="dart-label">Dart:</span> <span id="dart-num">1</span> of 3
+        </div>
+        
+        <div class="players" id="player-cards"></div>
+        <div class="target-board" id="board"></div>
 
-            <div class="controls">
-                <h3>What did you hit?</h3>
-                <div class="hit-options">
-                    <button class="hit-btn" onclick="recordHit(1)">SINGLE<br><small>1 Hit</small></button>
-                    <button class="hit-btn" onclick="recordHit(2)">DOUBLE<br><small>2 Hits</small></button>
-                    <button class="hit-btn" onclick="recordHit(3)">TRIPLE<br><small>3 Hits</small></button>
-                    <button class="hit-btn" onclick="recordHit(0)">MISS</button>
-                    <button class="hit-btn undo-row-btn" id="undo-btn" onclick="undoThrow()">↩ Undo Throw</button>
-                </div>
-                <button class="secondary-btn" onclick="resetGame()" style="margin-top: 15px;">New Game</button>
+        <div class="controls">
+            <h3>What did you hit? (Select target first)</h3>
+            <div class="hit-options">
+                <button class="hit-btn" onclick="recordHit(1)">SINGLE<br><small>1 Hit</small></button>
+                <button class="hit-btn" onclick="recordHit(2)">DOUBLE<br><small>2 Hits</small></button>
+                <button class="hit-btn" onclick="recordHit(3)">TRIPLE<br><small>3 Hits</small></button>
+                <button class="hit-btn" onclick="recordHit(0)">MISS</button>
+                <button class="hit-btn undo-row-btn" id="undo-btn" onclick="undoThrow()">↩ Undo Throw</button>
             </div>
+            <button class="secondary-btn" onclick="resetGame()" style="margin-top: 5px;">New Game</button>
         </div>
     </div>
 
-    <script>
-        let playerCount = 2;
-        const symbols = ['X', 'O', '▲', '■'];
-        // Distinct color themes for each player [Background/Card tint, Claimed Board Color, Text Color]
-        const playerStyles = [
-            { cardBg: '#ffe6e6', boardBg: '#ffcccc', text: '#b30000' }, // Player 1 (Red/Pink)
-            { cardBg: '#e6f2ff', boardBg: '#cce6ff', text: '#004080' }, // Player 2 (Blue)
-            { cardBg: '#e6ffe6', boardBg: '#ccffcc', text: '#006600' }, // Player 3 (Green)
-            { cardBg: '#fff5cc', boardBg: '#ffe680', text: '#806000' }  // Player 4 (Gold/Yellow)
-        ];
+    <!-- WIN SCREEN -->
+    <div class="game" id="win-screen" style="text-align: center; display: none;">
+        <h1>🏆 Victory! 🏆</h1>
+        <div id="winner-announcement" style="font-size: 22px; font-weight: bold; margin: 10px 0;"></div>
+        <h3 style="margin-top: 15px; margin-bottom: 5px; color: #aaa;">Final Board State</h3>
+        <div class="target-board" id="final-board" style="pointer-events: none; margin-bottom: 15px;"></div>
+        <button class="primary-btn" onclick="resetGame()">Play Again</button>
+    </div>
+</div>
 
-        let players = [];
-        let currentPlayer = 0;
-        let currentDart = 1;
-        let selectedTarget = null;
-        let throwHistory = [];
+<script>
+    let playerCount = 2;
+    const symbols = ['X', 'O', '▲', '■'];
+    const playerStyles = [
+        { cardBg: '#381c1c', boardBg: '#4d1a1a', text: '#ff4d4d' }, // Player 1 (Red)
+        { cardBg: '#1c2d38', boardBg: '#1a334d', text: '#4da6ff' }, // Player 2 (Blue)
+        { cardBg: '#1c381c', boardBg: '#1a4d1a', text: '#4dff4d' }, // Player 3 (Green)
+        { cardBg: '#38331c', boardBg: '#4d431a', text: '#ffd11a' }  // Player 4 (Gold)
+    ];
 
-        const numbers = [18, 3, 19, 14, 6, 7, 10, 15, 5, 17, 8, 4, 2, 16, 11, 20, 13, 9, 12, 1];
-        let boardState = {};
+    let players = [];
+    let currentPlayer = 0;
+    let currentDart = 1;
+    let selectedTarget = null;
+    let throwHistory = [];
+    const numbers = [18, 3, 19, 14, 6, 7, 10, 15, 5, 17, 8, 4, 2, 16, 11, 20, 13, 9, 12, 1];
+    let boardState = {};
 
-        function setPlayers(num) {
-            playerCount = num;
-            document.querySelectorAll('.count-btn').forEach((btn, idx) => {
-                btn.classList.toggle('active', idx === num - 2);
-            });
-            for (let i = 1; i <= 4; i++) {
-                const input = document.getElementById(`p${i}-name`);
-                if (input) input.style.display = i <= num ? 'block' : 'none';
+    // 5x4 Grid Winning Combination Indices
+    const winningCombos = [
+        // --- HORIZONTAL (Length 4 & 3) ---
+        [0,1,2,3], [1,2,3,4], [5,6,7,8], [6,7,8,9], [10,11,12,13], [11,12,13,14], [15,16,17,18], [16,17,18,19],
+        [0,1,2], [1,2,3], [2,3,4], [5,6,7], [6,7,8], [7,8,9], [10,11,12], [11,12,13], [12,13,14], [15,16,17], [16,17,18], [17,18,19],
+        
+        // --- VERTICAL (Length 4 & 3) ---
+        [0,5,10,15], [1,6,11,16], [2,7,12,17], [3,8,13,18], [4,9,14,19],
+        [0,5,10], [5,10,15], [1,6,11], [6,11,16], [2,7,12], [7,12,17], [3,8,13], [8,13,18], [4,9,14], [9,14,19],
+
+        // --- DIAGONALS ---
+        [0,6,12,18], [1,7,13,19], [3,7,11,15], [4,8,12,16],
+        [0,6,12], [6,12,18], [1,7,13], [7,13,19], [2,6,10], [3,7,11], [7,11,15], [4,8,12]
+    ];
+
+    function setPlayers(num) {
+        playerCount = num;
+        document.querySelectorAll('.count-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', idx === num - 2);
+        });
+        for (let i = 1; i <= 4; i++) {
+            const input = document.getElementById(`p${i}-name`);
+            if (input) input.style.display = i <= num ? 'block' : 'none';
+        }
+    }
+
+    function startGame() {
+        players = [];
+        for (let i = 1; i <= playerCount; i++) {
+            const name = document.getElementById(`p${i}-name`).value.trim() || `Player ${i}`;
+            players.push({ name, symbol: symbols[i - 1], style: playerStyles[i - 1] });
+        }
+        boardState = {};
+        numbers.forEach(num => {
+            boardState[num] = { hits: 0, owner: null };
+        });
+        throwHistory = [];
+        currentPlayer = 0;
+        currentDart = 1;
+        selectedTarget = null;
+        
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'flex';
+        
+        renderPlayerCards();
+        buildBoard();
+        updateUI();
+    }
+
+    function renderPlayerCards() {
+        const container = document.getElementById('player-cards');
+        container.innerHTML = players.map((p, idx) => `
+            <div class="player-card ${idx === currentPlayer ? 'active' : ''}" style="background: ${p.style.cardBg}; color: ${p.style.text};">
+                <strong>${p.name}</strong><br>${p.symbol}
+            </div>
+        `).join('');
+    }
+
+    function buildBoard() {
+        const board = document.getElementById('board');
+        board.innerHTML = numbers.map(num => {
+            const data = boardState[num];
+            let style = '';
+            let ownerText = 'Open';
+            if (data.owner !== null) {
+                const owner = players[data.owner];
+                style = `background: ${owner.style.boardBg}; border-color: ${owner.style.text}; color: ${owner.style.text};`;
+                ownerText = owner.symbol;
             }
-        }
+            return `
+                <div class="target ${selectedTarget === num ? 'selected' : ''}" style="${style}" onclick="selectTarget(${num})">
+                    <span class="target-number">${num}</span>
+                    <span class="target-hits">${data.hits}/3</span>
+                    <span class="target-owner">${ownerText}</span>
+                </div>
+            `;
+        }).join('');
+    }
 
-        function startGame() {
-            players = [];
-            for (let i = 1; i <= playerCount; i++) {
-                const name = document.getElementById(`p${i}-name`).value.trim() || `Player ${i}`;
-                players.push({ name, symbol: symbols[i - 1], style: playerStyles[i - 1] });
-            }
-            
-            boardState = {};
-            numbers.forEach(num => {
-                boardState[num] = { hits: 0, owner: null };
-            });
-            throwHistory = [];
-            currentPlayer = 0;
-            currentDart = 1;
-            selectedTarget = null;
+    function selectTarget(num) {
+        selectedTarget = num;
+        buildBoard();
+    }
 
-            document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
-            renderPlayerCards();
-            buildBoard();
-        }
+    function checkWinner() {
+        const requiredLength = (playerCount === 2) ? 4 : 3;
 
-        function renderPlayerCards() {
-            const container = document.getElementById('player-cards');
-            container.innerHTML = players.map((p, idx) => {
-                const isActive = idx === currentPlayer;
-                const bgStyle = isActive ? `background: ${p.style.cardBg};` : '';
-                return `
-                    <div class="player-card ${isActive ? 'active' : ''}" style="${bgStyle}">
-                        <span class="player-symbol" style="color: ${p.style.text}">${p.symbol}</span>
-                        <div>${p.name}</div>
-                    </div>
-                `;
-            }).join('');
-        }
+        for (let combo of winningCombos) {
+            if (combo.length !== requiredLength) continue;
 
-        function selectTarget(num) {
-            selectedTarget = num;
-            renderBoard();
-        }
+            const firstOwner = boardState[numbers[combo[0]]]?.owner;
+            if (firstOwner === null || firstOwner === undefined) continue;
 
-        function buildBoard() {
-            renderBoard();
-        }
-
-        function renderBoard() {
-            const board = document.getElementById('board');
-            board.innerHTML = numbers.map(num => {
-                const data = boardState[num];
-                const isSelected = selectedTarget === num;
-                
-                let tileStyle = '';
-                let ownerText = 'Unclaimed';
-                
-                if (data.owner !== null) {
-                    const owner = players[data.owner];
-                    tileStyle = `background: ${owner.style.boardBg}; border-color: ${owner.style.text}; color: ${owner.style.text};`;
-                    ownerText = `Claimed by ${owner.symbol}`;
-                } else if (isSelected) {
-                    tileStyle = 'border: 3px solid #8a2be2; background: #dcd0ff;';
+            let isWin = true;
+            for (let i = 1; i < combo.length; i++) {
+                if (boardState[numbers[combo[i]]]?.owner !== firstOwner) {
+                    isWin = false;
+                    break;
                 }
+            }
 
-                return `
-                    <div class="target ${isSelected ? 'selected' : ''}" onclick="selectTarget(${num})" style="${tileStyle}">
-                        <span class="target-number">${num}</span>
-                        <span class="target-hits">${data.hits} / 3 Hits</span>
-                        <span class="target-owner">${ownerText}</span>
-                    </div>
-                `;
-            }).join('');
+            if (isWin) {
+                return firstOwner;
+            }
+        }
+        return null;
+    }
+
+    function recordHit(hits) {
+        if (selectedTarget === null && hits > 0) {
+            alert('Please select a target number on the board first!');
+            return;
         }
 
-        function recordHit(hits) {
-            throwHistory.push({
-                player: currentPlayer,
-                dart: currentDart,
-                target: selectedTarget,
-                prevHits: selectedTarget ? boardState[selectedTarget].hits : 0,
-                prevOwner: selectedTarget ? boardState[selectedTarget].owner : null
-            });
+        throwHistory.push({
+            player: currentPlayer,
+            dart: currentDart,
+            target: selectedTarget,
+            prevHits: selectedTarget !== null ? boardState[selectedTarget].hits : 0,
+            prevOwner: selectedTarget !== null ? boardState[selectedTarget].owner : null
+        });
 
-            if (hits > 0 && selectedTarget !== null) {
-                let currentData = boardState[selectedTarget];
-                if (currentData.owner === null) {
-                    currentData.hits += hits;
-                    if (currentData.hits >= 3) {
-                        currentData.hits = 3;
-                        currentData.owner = currentPlayer;
+        if (hits > 0 && selectedTarget !== null) {
+            let currentData = boardState[selectedTarget];
+            if (currentData.owner === null) {
+                currentData.hits += hits;
+                if (currentData.hits >= 3) {
+                    currentData.hits = 3;
+                    currentData.owner = currentPlayer;
+
+                    // Immediate win check upon claiming
+                    let winnerIdx = checkWinner();
+                    if (winnerIdx !== null) {
+                        triggerWin(winnerIdx);
+                        return;
                     }
                 }
             }
-
-            if (currentDart < 3) {
-                currentDart++;
-            } else {
-                currentDart = 1;
-                currentPlayer = (currentPlayer + 1) % players.length;
-                selectedTarget = null;
-            }
-            updateUI();
         }
 
-        function undoThrow() {
-            if (throwHistory.length === 0) return;
-            const lastThrow = throwHistory.pop();
-            currentPlayer = lastThrow.player;
-            currentDart = lastThrow.dart;
-            selectedTarget = lastThrow.target;
-
-            if (lastThrow.target !== null) {
-                boardState[lastThrow.target].hits = lastThrow.prevHits;
-                boardState[lastThrow.target].owner = lastThrow.prevOwner;
-            }
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('dart-num').textContent = currentDart;
-            document.getElementById('turn-indicator').textContent = `${players[currentPlayer].name}'s Turn (${players[currentPlayer].symbol})`;
-            renderPlayerCards();
-            renderBoard();
-        }
-
-        function resetGame() {
-            document.getElementById('game-screen').style.display = 'none';
-            document.getElementById('setup-screen').style.display = 'block';
-            currentPlayer = 0;
+        if (currentDart < 3) {
+            currentDart++;
+        } else {
             currentDart = 1;
+            currentPlayer = (currentPlayer + 1) % players.length;
             selectedTarget = null;
         }
-    </script>
+        updateUI();
+    }
+
+    function undoThrow() {
+        if (throwHistory.length === 0) return;
+        let last = throwHistory.pop();
+
+        currentPlayer = last.player;
+        currentDart = last.dart;
+        selectedTarget = last.target;
+
+        if (last.target !== null) {
+            boardState[last.target].hits = last.prevHits;
+            boardState[last.target].owner = last.prevOwner;
+        }
+        updateUI();
+    }
+
+    function updateUI() {
+        renderPlayerCards();
+        buildBoard();
+        const p = players[currentPlayer];
+        document.getElementById('turn-indicator').innerText = `${p.name}'s Turn (${p.symbol})`;
+        document.getElementById('turn-indicator').style.color = p.style.text;
+        document.getElementById('dart-num').innerText = currentDart;
+    }
+
+    function triggerWin(winnerIdx) {
+        const winner = players[winnerIdx];
+
+        document.getElementById('winner-announcement').innerHTML = `
+            <span style="font-size: 32px; color: ${winner.style.text};">${winner.symbol}</span><br>
+            <span style="color: #fff;">${winner.name} Wins the Game!</span>
+        `;
+
+        const finalBoardContainer = document.getElementById('final-board');
+        finalBoardContainer.innerHTML = numbers.map(num => {
+            const data = boardState[num];
+            let style = '';
+            let ownerText = 'Open';
+            if (data.owner !== null) {
+                const owner = players[data.owner];
+                style = `background: ${owner.style.boardBg}; border-color: ${owner.style.text}; color: ${owner.style.text};`;
+                ownerText = owner.symbol;
+            }
+            return `
+                <div class="target" style="${style}">
+                    <span class="target-number">${num}</span>
+                    <span class="target-hits">${data.hits}/3</span>
+                    <span class="target-owner">${ownerText}</span>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'flex';
+    }
+
+    function resetGame() {
+        document.getElementById('win-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'none';
+        document.getElementById('setup-screen').style.display = 'flex';
+    }
+</script>
+
 </body>
 </html>
