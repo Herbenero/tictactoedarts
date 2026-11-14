@@ -22,7 +22,7 @@
         }
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 640px;
             background: rgba(30, 30, 30, 0.92);
             padding: 20px;
             border-radius: 12px;
@@ -116,8 +116,9 @@
             font-weight: bold;
         }
         .darts-left {
-            font-size: 16px;
+            font-size: 15px;
             color: #aaa;
+            text-align: right;
         }
         .multiplier-bar {
             display: flex;
@@ -138,15 +139,15 @@
         }
         .board {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
             margin-bottom: 15px;
         }
         .cell {
             background: #2a2a2a;
             border: 2px solid #444;
             border-radius: 8px;
-            height: 95px;
+            height: 82px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -160,24 +161,24 @@
             transform: scale(0.96);
         }
         .cell-num {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
             color: #fff;
         }
         .cell-marks {
-            font-size: 14px;
-            margin-top: 5px;
-            height: 18px;
+            font-size: 13px;
+            margin-top: 4px;
+            height: 16px;
             color: #ffca28;
             letter-spacing: 2px;
         }
         .cell-owner {
             position: absolute;
-            top: 4px;
-            right: 6px;
-            font-size: 12px;
+            top: 3px;
+            right: 4px;
+            font-size: 10px;
             font-weight: bold;
-            padding: 2px 6px;
+            padding: 1px 5px;
             border-radius: 4px;
         }
         .controls-row {
@@ -296,9 +297,9 @@
         <div class="setup-group">
             <label>Select Player Count</label>
             <div class="player-count-btns">
-                <button type="button" class="count-btn active" data-count="2">2 Players</button>
-                <button type="button" class="count-btn" data-count="3">3 Players</button>
-                <button type="button" class="count-btn" data-count="4">4 Players</button>
+                <button type="button" class="count-btn active" data-count="2">2 Players (4 in a Row)</button>
+                <button type="button" class="count-btn" data-count="3">3 Players (3 in a Row)</button>
+                <button type="button" class="count-btn" data-count="4">4 Players (3 in a Row)</button>
             </div>
         </div>
         <div class="setup-group" id="player-inputs">
@@ -347,7 +348,7 @@
         </div>
 
         <div class="board" id="board">
-            <!-- 9 Cells dynamically generated -->
+            <!-- 20 Cells dynamically generated -->
         </div>
 
         <div class="controls-row">
@@ -381,6 +382,9 @@
     const db = getFirestore(app);
     const LEAGUE_URL = "https://herbenero.github.io/Hellcastle-League/";
 
+    const ROWS = 4;
+    const COLS = 5;
+
     // State Variables
     let playerCount = 2;
     let players = [];
@@ -393,12 +397,6 @@
     let boardNumbers = [];
     let cells = [];
     let history = [];
-
-    const winLines = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Cols
-        [0, 4, 8], [2, 4, 6]             // Diagonals
-    ];
 
     const playerColors = ['#f44336', '#2196f3', '#4caf50', '#ffc107'];
 
@@ -414,6 +412,10 @@
     const winnerBanner = document.getElementById('winner-banner');
     const winnerText = document.getElementById('winner-text');
     const undoBtn = document.getElementById('undo-btn');
+
+    function getTargetStreak() {
+        return players.length === 2 ? 4 : 3;
+    }
 
     async function loadSavedLeagues() {
         const select = document.getElementById('targetLeagueSelect');
@@ -457,14 +459,15 @@
         localStorage.setItem('haalis_selected_target_league', selectedLeague);
 
         const boardLabel = boardType === 'quad' ? 'Quad Board' : 'Basic Board';
+        const targetStreak = getTargetStreak();
 
         const rankedPlayers = players
             .map((name, idx) => {
                 const squaresOwned = cells.filter(c => c.owner === idx).length;
                 const isTicTacToeWinner = winningPlayerIndex === idx;
-                const notesParts = [`${squaresOwned}/9 squares claimed`];
+                const notesParts = [`${squaresOwned}/20 squares claimed`];
                 if (isTicTacToeWinner) {
-                    notesParts.unshift("3-in-a-row Victory");
+                    notesParts.unshift(`${targetStreak}-in-a-row Victory`);
                 }
                 notesParts.push(boardLabel);
 
@@ -557,16 +560,14 @@
         initGame();
     });
 
-    // Generate 9 Unique Numbers (1-20 + Bull=25)
+    // Generate all 20 Numbers (1-20) in randomized order
     function generateBoardNumbers() {
         const pool = Array.from({ length: 20 }, (_, i) => i + 1);
-        pool.push(25); // Bullseye
-
         for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-        return pool.slice(0, 9);
+        return pool;
     }
 
     function initGame() {
@@ -648,7 +649,6 @@
                 div.classList.add(`p${cell.owner}-bg`);
             }
 
-            const numLabel = cell.number === 25 ? 'BULL' : cell.number;
             const currentMarks = cell.marks[currentPlayerIndex];
             let markStr = '';
             if (cell.owner === null && currentMarks > 0) {
@@ -662,7 +662,7 @@
 
             div.innerHTML = `
                 ${ownerTag}
-                <div class="cell-num">${numLabel}</div>
+                <div class="cell-num">${cell.number}</div>
                 <div class="cell-marks">${markStr}</div>
             `;
 
@@ -676,11 +676,8 @@
         saveHistory();
 
         const cell = cells[index];
-        // Limit Bullseye to max 2x (Double Bull)
-        let effectiveMult = (cell.number === 25 && currentMultiplier > 2) ? 2 : currentMultiplier;
-
         if (cell.owner === null) {
-            cell.marks[currentPlayerIndex] += effectiveMult;
+            cell.marks[currentPlayerIndex] += currentMultiplier;
             if (cell.marks[currentPlayerIndex] >= 3) {
                 cell.marks[currentPlayerIndex] = 3;
                 cell.owner = currentPlayerIndex;
@@ -711,24 +708,55 @@
         updateStatus();
     }
 
+    function hasNInARow(playerIdx, targetCount) {
+        const directions = [
+            [0, 1],  // Horizontal
+            [1, 0],  // Vertical
+            [1, 1],  // Diagonal down-right
+            [1, -1]  // Diagonal down-left
+        ];
+
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const startOwner = cells[r * COLS + c].owner;
+                if (startOwner !== playerIdx) continue;
+
+                for (const [dr, dc] of directions) {
+                    let count = 1;
+                    for (let step = 1; step < targetCount; step++) {
+                        const nr = r + dr * step;
+                        const nc = c + dc * step;
+                        if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) break;
+                        if (cells[nr * COLS + nc].owner === playerIdx) {
+                            count++;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (count >= targetCount) return true;
+                }
+            }
+        }
+        return false;
+    }
+
     function checkWin() {
-        // 1. Check 3-in-a-row win condition
-        for (let line of winLines) {
-            const [a, b, c] = line;
-            if (cells[a].owner !== null &&
-                cells[a].owner === cells[b].owner &&
-                cells[a].owner === cells[c].owner) {
-                endGame(cells[a].owner);
+        const targetStreak = getTargetStreak();
+
+        // 1. Check N-in-a-row win condition (4 for 2 players, 3 for 3/4 players)
+        for (let idx = 0; idx < players.length; idx++) {
+            if (hasNInARow(idx, targetStreak)) {
+                endGame(idx, targetStreak);
                 return true;
             }
         }
 
-        // 2. Check if all 9 squares are claimed (Tiebreaker by total squares)
+        // 2. Check if all 20 squares are claimed (Tiebreaker by total squares)
         const allClaimed = cells.every(c => c.owner !== null);
         if (allClaimed) {
-            let counts = players.map((_, idx) => cells.filter(c => c.owner === idx).length);
-            let maxSquares = Math.max(...counts);
-            let winners = players.filter((_, idx) => counts[idx] === maxSquares);
+            const counts = players.map((_, idx) => cells.filter(c => c.owner === idx).length);
+            const maxSquares = Math.max(...counts);
+            const winners = players.filter((_, idx) => counts[idx] === maxSquares);
 
             gameOver = true;
             winningPlayerIndex = winners.length === 1 ? counts.indexOf(maxSquares) : null;
@@ -745,10 +773,10 @@
         return false;
     }
 
-    function endGame(winnerIdx) {
+    function endGame(winnerIdx, targetStreak) {
         gameOver = true;
         winningPlayerIndex = winnerIdx;
-        winnerText.textContent = `🏆 ${players[winnerIdx]} Wins with 3-in-a-Row!`;
+        winnerText.textContent = `🏆 ${players[winnerIdx]} Wins with ${targetStreak}-in-a-Row!`;
         winnerBanner.style.display = 'block';
         turnDisplay.textContent = "Game Over!";
         dartsDisplay.textContent = "";
@@ -757,9 +785,10 @@
 
     function updateStatus() {
         if (gameOver) return;
+        const targetStreak = getTargetStreak();
         turnDisplay.textContent = `${players[currentPlayerIndex]}'s Turn`;
         turnDisplay.style.color = playerColors[currentPlayerIndex];
-        dartsDisplay.textContent = `Darts: ${dartsRemaining}`;
+        dartsDisplay.textContent = `Darts: ${dartsRemaining} • Goal: ${targetStreak} in a row`;
         renderBoard(); // Refresh marks display for the active player
     }
 
